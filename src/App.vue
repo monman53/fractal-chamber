@@ -20,7 +20,7 @@ const widthPx = computed(() => {
       <StageCanvas></StageCanvas>
     </div>
     <div id="svg">
-      <StageUI></StageUI>
+      <!-- <StageUI></StageUI> -->
     </div>
   </div>
 </template>
