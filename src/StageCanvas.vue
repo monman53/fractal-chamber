@@ -1,37 +1,39 @@
 <script setup lang="ts">
 import { onMounted, ref, watch, type Ref } from 'vue';
 import { app } from './main';
+import updatePositionVS from './glsl/updatePosition.vert'
 
-const updatePositionVS = `#version 300 es
-  in vec2 oldPosition;
-  in vec2 velocity;
+// const updatePositionVS = 
+// const updatePositionVS = `#version 300 es
+//   in vec2 oldPosition;
+//   in vec2 velocity;
 
-  uniform float deltaTime;
-  uniform vec2 canvasDimensions;
+//   uniform float deltaTime;
+//   uniform vec2 canvasDimensions;
 
-  out vec2 newPosition;
+//   out vec2 newPosition;
 
-  vec2 euclideanModulo(vec2 n, vec2 m) {
-    if (n.x > m.x * 0.5) {
-        n.x -= m.x;
-    } else if (n.x < -m.x * 0.5) {
-        n.x += m.x;
-    }
-    if (n.y > m.y * 0.5) {
-        n.y -= m.y;
-    } else if (n.y < -m.y * 0.5) {
-        n.y += m.y;
-    }
-    return n;
-  	//return mod(mod(n, m) + m, m);
-  }
+//   vec2 euclideanModulo(vec2 n, vec2 m) {
+//     if (n.x > m.x * 0.5) {
+//         n.x -= m.x;
+//     } else if (n.x < -m.x * 0.5) {
+//         n.x += m.x;
+//     }
+//     if (n.y > m.y * 0.5) {
+//         n.y -= m.y;
+//     } else if (n.y < -m.y * 0.5) {
+//         n.y += m.y;
+//     }
+//     return n;
+//   	//return mod(mod(n, m) + m, m);
+//   }
 
-  void main() {
-    newPosition = euclideanModulo(
-        oldPosition + velocity * deltaTime,
-        canvasDimensions);
-  }
-  `;
+//   void main() {
+//     newPosition = euclideanModulo(
+//         oldPosition + velocity * deltaTime,
+//         canvasDimensions);
+//   }
+//   `;
 
 const updatePositionFS = `#version 300 es
   precision highp float;
