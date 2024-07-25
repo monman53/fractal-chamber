@@ -1,65 +1,13 @@
 <script setup lang="ts">
 import { onMounted, ref, watch, type Ref } from 'vue';
 import { app } from './main';
+
+// Shaders
 import updatePositionVS from './glsl/updatePosition.vert'
+import updatePositionFS from './glsl/updatePosition.frag'
+import drawParticlesVS from './glsl/drawParticles.vert'
+import drawParticlesFS from './glsl/drawParticles.frag'
 
-// const updatePositionVS = 
-// const updatePositionVS = `#version 300 es
-//   in vec2 oldPosition;
-//   in vec2 velocity;
-
-//   uniform float deltaTime;
-//   uniform vec2 canvasDimensions;
-
-//   out vec2 newPosition;
-
-//   vec2 euclideanModulo(vec2 n, vec2 m) {
-//     if (n.x > m.x * 0.5) {
-//         n.x -= m.x;
-//     } else if (n.x < -m.x * 0.5) {
-//         n.x += m.x;
-//     }
-//     if (n.y > m.y * 0.5) {
-//         n.y -= m.y;
-//     } else if (n.y < -m.y * 0.5) {
-//         n.y += m.y;
-//     }
-//     return n;
-//   	//return mod(mod(n, m) + m, m);
-//   }
-
-//   void main() {
-//     newPosition = euclideanModulo(
-//         oldPosition + velocity * deltaTime,
-//         canvasDimensions);
-//   }
-//   `;
-
-const updatePositionFS = `#version 300 es
-  precision highp float;
-  void main() {
-  }
-  `;
-
-const drawParticlesVS = `#version 300 es
-  in vec4 position;
-  uniform mat4 matrix;
-
-  void main() {
-    // do the common matrix math
-    gl_Position = matrix * position;
-    // gl_Position = position;
-    gl_PointSize = 1.0;
-  }
-  `;
-
-const drawParticlesFS = `#version 300 es
-  precision highp float;
-  out vec4 outColor;
-  void main() {
-    outColor = vec4(1, 1, 1, 1);
-  }
-  `;
 const canvas = ref()
 onMounted(() => {
 
@@ -113,11 +61,6 @@ onMounted(() => {
         position: gl.getAttribLocation(drawParticlesProgram, 'position'),
         matrix: gl.getUniformLocation(drawParticlesProgram, 'matrix'),
     };
-
-    // we're going to base the initial positions on the size
-    // of the canvas so lets update the size of the canvas
-    // to the initial size we want
-    // webglUtils.resizeCanvasToDisplaySize(gl.canvas);
 
     // create random positions and velocities.
     const rand = (min: any, max: any) => {
