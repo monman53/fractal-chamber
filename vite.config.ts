@@ -18,5 +18,6 @@ export default defineConfig({
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))
     }
-  }
+  },
+  base: 'https://monman53.github.io/fractal-chamber/'
 })
