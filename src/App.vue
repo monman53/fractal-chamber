@@ -1,17 +1,16 @@
 <script setup lang="ts">
-import { computed } from 'vue';
-import StageCanvas from './StageCanvas.vue';
-import StageUI from './StageUI.vue';
-import { app } from './main';
+import { computed } from 'vue'
+import StageCanvas from './StageCanvas.vue'
+import StageUI from './StageUI.vue'
+import { app } from './main'
 
 const heightPx = computed(() => {
-  return app.value.height + "px"
+  return app.value.height + 'px'
 })
 
 const widthPx = computed(() => {
-  return app.value.width + "px"
+  return app.value.width + 'px'
 })
-
 </script>
 
 <template>
