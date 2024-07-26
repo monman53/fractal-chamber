@@ -11,6 +11,7 @@ import updatePositionVS from './glsl/updatePosition.vert'
 import updatePositionFS from './glsl/updatePosition.frag'
 import drawParticlesVS from './glsl/drawParticles.vert'
 import drawParticlesFS from './glsl/drawParticles.frag'
+import { vec, Vec, vecRad } from './math';
 
 //--------------------------------
 // WebGL support functions
@@ -135,7 +136,7 @@ onMounted(() => {
         }
         return Math.random() * (max - min) + min;
     };
-    const numParticles = 1024 * 1024 * 4;
+    const numParticles = 1024 * 1024;
     const createPoints = (num: number, ranges: any[]) =>
         new Array(num).fill(0).map(_ => ranges.map(range => rand(range[0], range[1]))).flat();
     const positions = new Float32Array(createPoints(numParticles, [[-0.5 * canvas.value.width, 0.5 * canvas.value.width], [-0.5 * canvas.value.height, 0.5 * canvas.value.height]]));
@@ -171,13 +172,15 @@ onMounted(() => {
         updateVA: updatePositionVA1,  // read from position1
         tf: tf2,                      // write to position2
         drawVA: drawVA2,              // draw with position2
-        buffer: position1Buffer,
+        buffer: position2Buffer,
+        velocityBuffer: velocity2Buffer,
     };
     let next = {
         updateVA: updatePositionVA2,  // read from position2
         tf: tf1,                      // write to position1
         drawVA: drawVA1,              // draw with position1
-        buffer: position2Buffer,
+        buffer: position1Buffer,
+        velocityBuffer: velocity1Buffer,
     };
 
     // unbind left over stuff
@@ -235,15 +238,23 @@ onMounted(() => {
         //--------------------------------
         gl.enable(gl.BLEND);
         gl.useProgram(drawParticlesProgram);
-        if (Math.random() < 0.05) {
-            gl.bindBuffer(gl.ARRAY_BUFFER, next.buffer);
-            const n = numParticles / 32
+        if (Math.random() < 0.5) {
+            const s = vec(Math.random() * canvas.value.width, Math.random() * canvas.value.height)
+            // const v = vecRad(Math.random() * 2 * Math.PI).mul(parameter.value.length)
+            const v = vecRad(Math.random() * 2 * Math.PI)
+
+            const n = numParticles / 128 / 2
             hoge = (hoge + n) % numParticles
             // const n = 1
-            for (let i = 0; i < n * 2; i++) {
-                positions[i] = i / 1000
+            for (let i = 0; i < n * 2; i += 2) {
+                const t = s.add(v.mul(Math.random() * parameter.value.length))
+                positions[i] = t.x
+                positions[i + 1] = t.y
             }
+            gl.bindBuffer(gl.ARRAY_BUFFER, current.buffer);
             gl.bufferSubData(gl.ARRAY_BUFFER, hoge * 4 * 2, positions, 0, n * 2);
+            gl.bindBuffer(gl.ARRAY_BUFFER, current.velocityBuffer);
+            gl.bufferSubData(gl.ARRAY_BUFFER, hoge * 4 * 2, velocities, 0, n * 2);
             gl.bindBuffer(gl.ARRAY_BUFFER, null);
         }
 

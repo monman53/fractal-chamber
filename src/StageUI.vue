@@ -20,7 +20,7 @@ import { humanReadable } from './utils';
         </label>
         <label>
             simplexScale: {{ humanReadable(parameter.simplexScale) }}<br>
-            <input type="range" v-model.number="parameter.simplexScale" :step="0.01" :min="0.0" :max="1000"><br>
+            <input type="range" v-model.number="parameter.simplexScale" :step="0.01" :min="0.0" :max="100"><br>
         </label>
         <label>
             k: {{ humanReadable(parameter.k) }}<br>

@@ -2,6 +2,7 @@
 
 #include ./utils.glsl
 vec4 openSimplex2SDerivatives_ImproveXY(vec3);
+float rand(vec2);
 
 in vec2 oldPosition;
 in vec2 oldVelocity;
@@ -36,6 +37,6 @@ void main() {
     vec4 random = openSimplex2SDerivatives_ImproveXY(vec3(oldPosition.xy * simplexResolution, time * simplexTimeScale));
     newPosition = euclideanModulo(oldPosition + oldVelocity * deltaTime, canvasDimensions);
     float m = 1.0f;
-    vec2 accel = simplexScale * random.xy - k / m * oldVelocity;
+    vec2 accel = simplexScale * random.xy - k / m * oldVelocity + vec2(rand(oldPosition.xy) - 0.5f, rand(oldPosition.xy + 0.1f) - 0.5f) * 300.f;
     newVelocity = oldVelocity + accel * deltaTime;
 }
