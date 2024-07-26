@@ -11,7 +11,7 @@ import updatePositionVS from './glsl/updatePosition.vert'
 import updatePositionFS from './glsl/updatePosition.frag'
 import drawParticlesVS from './glsl/drawParticles.vert'
 import drawParticlesFS from './glsl/drawParticles.frag'
-import { vec, Vec, vecRad } from './math'
+import { normalDistribution, vec, Vec, vecRad } from './math'
 
 //--------------------------------
 // WebGL support functions
@@ -140,12 +140,13 @@ onMounted(() => {
     }
     return Math.random() * (max - min) + min
   }
-  const numParticles = 1024 * 64 * 3
+  const numParticles = 1024 * 1024 * 3
   const createPoints = (num: number, ranges: any[]) =>
     new Array(num)
       .fill(0)
       .map((_) => ranges.map((range) => rand(range[0], range[1])))
       .flat()
+  // new Array(num * 3).fill(-1000)
   const positions = new Float32Array(
     createPoints(numParticles, [
       [-0.5 * canvas.value.width, 0.5 * canvas.value.width],
@@ -258,14 +259,15 @@ onMounted(() => {
     gl.enable(gl.BLEND)
     gl.useProgram(drawParticlesProgram)
 
-    if (Math.random() < 0.2) {
+    if (Math.random() < 0.1) {
       const s = vec(Math.random() * canvas.value.width, Math.random() * canvas.value.height)
       const v = vecRad(Math.random() * 2 * Math.PI)
 
       const n = 1024 * 2
       hoge = (hoge + n) % numParticles
+      const length = parameter.value.length + normalDistribution() * parameter.value.lengthStd
       for (let i = 0; i < n * 3; i += 3) {
-        const t = s.add(v.mul(Math.random() * parameter.value.length))
+        const t = s.add(v.mul(Math.random() * length))
         positions[i] = t.x
         positions[i + 1] = t.y
         positions[i + 2] = 0

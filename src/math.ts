@@ -268,3 +268,7 @@ export const intersectionX = (s: Vec, v: Vec, y: number, xMin: number, xMax: num
     }
   }
 }
+
+export const normalDistribution = () => {
+  return Math.sqrt(-2 * Math.log(1 - Math.random())) * Math.cos(2 * Math.PI * Math.random())
+}

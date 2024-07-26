@@ -15,7 +15,8 @@ export const parameter = ref({
   simplexTimeScale: 0.001,
   k: 1.1,
   opacity: 0.5,
-  length: 100,
+  length: 150,
+  lengthStd: 50,
   diffusion: 250,
   gravity: -1.0
 })
