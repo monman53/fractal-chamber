@@ -26,6 +26,10 @@ import { humanReadable } from './utils';
             k: {{ humanReadable(parameter.k) }}<br>
             <input type="range" v-model.number="parameter.k" :step="0.01" :min="0.0" :max="10"><br>
         </label>
+        <label>
+            Opacity: {{ humanReadable(parameter.opacity) }}<br>
+            <input type="range" v-model.number="parameter.opacity" :step="0.0001" :min="0" :max="1"><br>
+        </label>
     </div>
 </template>
 

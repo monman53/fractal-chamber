@@ -13,7 +13,8 @@ export const parameter = ref({
   simplexResolution: 0.01,
   simplexScale: 100.0,
   simplexTimeScale: 1.0,
-  k: 1
+  k: 1,
+  opacity: 0.01
 })
 
 const resize = () => {

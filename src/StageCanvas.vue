@@ -121,6 +121,7 @@ onMounted(() => {
     const drawParticlesProgLocs = {
         position: gl.getAttribLocation(drawParticlesProgram, 'position'),
         matrix: gl.getUniformLocation(drawParticlesProgram, 'matrix'),
+        opacity: gl.getUniformLocation(drawParticlesProgram, 'opacity'),
     };
 
     //--------------------------------
@@ -257,6 +258,7 @@ onMounted(() => {
             [0, 0, 0, 1],
         ].flat()
         gl.uniformMatrix4fv(drawParticlesProgLocs.matrix, false, matrix);
+        gl.uniform1f(drawParticlesProgLocs.opacity, parameter.value.opacity);
         gl.drawArrays(gl.POINTS, 0, numParticles);
 
         //--------------------------------
