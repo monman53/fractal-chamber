@@ -9,6 +9,10 @@ in vec2 oldVelocity;
 uniform float time;
 uniform float deltaTime;
 uniform vec2 canvasDimensions;
+uniform float simplexResolution;
+uniform float simplexScale;
+uniform float simplexTimeScale;
+uniform float k;
 
 out vec2 newPosition;
 out vec2 newVelocity;
@@ -29,12 +33,9 @@ vec2 euclideanModulo(vec2 n, vec2 m) {
 }
 
 void main() {
-    vec4 random = openSimplex2SDerivatives_ImproveXY(vec3(oldPosition.xy / 100.f, time));
+    vec4 random = openSimplex2SDerivatives_ImproveXY(vec3(oldPosition.xy * simplexResolution, time * simplexTimeScale));
     newPosition = euclideanModulo(oldPosition + oldVelocity * deltaTime, canvasDimensions);
-    // newPosition = oldPosition + oldVelocity * deltaTime;
     float m = 1.0f;
-    float k = 1.0f;
-    vec2 accel = 100.f * random.xy - k / m * oldVelocity;
-    newVelocity = oldVelocity + accel * deltaTime; 
-    // newVelocity = oldVelocity + random.xy;
+    vec2 accel = simplexScale * random.xy - k / m * oldVelocity;
+    newVelocity = oldVelocity + accel * deltaTime;
 }

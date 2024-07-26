@@ -20,7 +20,7 @@ const widthPx = computed(() => {
       <StageCanvas></StageCanvas>
     </div>
     <div id="svg">
-      <!-- <StageUI></StageUI> -->
+      <StageUI></StageUI>
     </div>
   </div>
 </template>
@@ -35,6 +35,6 @@ const widthPx = computed(() => {
   position: absolute;
   overflow: hidden;
   height: v-bind(heightPx);
-  width: v-bind(widthPx);
+  /* width: v-bind(widthPx); */
 }
 </style>

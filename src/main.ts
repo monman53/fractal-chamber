@@ -5,7 +5,15 @@ import App from './App.vue'
 
 export const app = ref({
   width: window.innerWidth,
-  height: window.innerHeight
+  height: window.innerHeight,
+  fps: 0
+})
+
+export const parameter = ref({
+  simplexResolution: 0.01,
+  simplexScale: 100.0,
+  simplexTimeScale: 1.0,
+  k: 1
 })
 
 const resize = () => {

@@ -1,6 +1,10 @@
+<script lang="ts">
+export const fps = ref(0)
+</script>
+
 <script setup lang="ts">
 import { onMounted, ref, watch, type Ref } from 'vue';
-import { app } from './main';
+import { app, parameter } from './main';
 
 // Shaders
 import updatePositionVS from './glsl/updatePosition.vert'
@@ -108,6 +112,10 @@ onMounted(() => {
         canvasDimensions: gl.getUniformLocation(updatePositionProgram, 'canvasDimensions'),
         time: gl.getUniformLocation(updatePositionProgram, 'time'),
         deltaTime: gl.getUniformLocation(updatePositionProgram, 'deltaTime'),
+        simplexResolution: gl.getUniformLocation(updatePositionProgram, 'simplexResolution'),
+        simplexScale: gl.getUniformLocation(updatePositionProgram, 'simplexScale'),
+        simplexTimeScale: gl.getUniformLocation(updatePositionProgram, 'simplexTimeScale'),
+        k: gl.getUniformLocation(updatePositionProgram, 'k'),
     };
 
     const drawParticlesProgLocs = {
@@ -188,6 +196,7 @@ onMounted(() => {
         time *= 0.001;
         // Subtract the previous time from the current time
         const deltaTime = time - then;
+        fps.value = 1.0 / deltaTime
         // Remember the current time for the next frame.
         then = time;
 
@@ -215,6 +224,10 @@ onMounted(() => {
         gl.uniform2f(updatePositionPrgLocs.canvasDimensions, gl.canvas.width, gl.canvas.height);
         gl.uniform1f(updatePositionPrgLocs.time, time);
         gl.uniform1f(updatePositionPrgLocs.deltaTime, deltaTime);
+        gl.uniform1f(updatePositionPrgLocs.simplexResolution, parameter.value.simplexResolution);
+        gl.uniform1f(updatePositionPrgLocs.simplexScale, parameter.value.simplexScale);
+        gl.uniform1f(updatePositionPrgLocs.simplexTimeScale, parameter.value.simplexTimeScale);
+        gl.uniform1f(updatePositionPrgLocs.k, parameter.value.k);
 
         gl.enable(gl.RASTERIZER_DISCARD);
 
