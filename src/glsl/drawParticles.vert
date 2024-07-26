@@ -4,8 +4,6 @@ in vec4 position;
 uniform mat4 matrix;
 
 void main() {
-    // do the common matrix math
-    gl_Position = matrix * position;
-    // gl_Position = position;
+    gl_Position = matrix * position + vec4(-0.f, -0.f, 0.f, 0.f);
     gl_PointSize = 1.0f;
 }

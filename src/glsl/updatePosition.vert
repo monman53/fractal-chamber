@@ -1,8 +1,12 @@
 #version 300 es
 
+#include ./utils.glsl
+vec4 openSimplex2SDerivatives_ImproveXY(vec3);
+
 in vec2 oldPosition;
 in vec2 oldVelocity;
 
+uniform float time;
 uniform float deltaTime;
 uniform vec2 canvasDimensions;
 
@@ -25,6 +29,12 @@ vec2 euclideanModulo(vec2 n, vec2 m) {
 }
 
 void main() {
+    vec4 random = openSimplex2SDerivatives_ImproveXY(vec3(oldPosition.xy / 100.f, time));
     newPosition = euclideanModulo(oldPosition + oldVelocity * deltaTime, canvasDimensions);
-    newVelocity = oldVelocity + vec2(0.01f);
+    // newPosition = oldPosition + oldVelocity * deltaTime;
+    float m = 1.0f;
+    float k = 1.0f;
+    vec2 accel = 100.f * random.xy - k / m * oldVelocity;
+    newVelocity = oldVelocity + accel * deltaTime; 
+    // newVelocity = oldVelocity + random.xy;
 }

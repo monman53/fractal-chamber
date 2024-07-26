@@ -83,11 +83,16 @@ function makeVertexArray(gl: WebGL2RenderingContext, bufLocPairs: any) {
     }
     return va;
 }
-
+const offscreenCanvas = new OffscreenCanvas(app.value.width, app.value.height)
+const gl = offscreenCanvas.getContext('webgl2', { alpha: true })
 const canvas = ref()
 onMounted(() => {
-    let hoge = 0
-    const gl = canvas.value.getContext('webgl2')
+    // let hoge = 0
+    // const gl = canvas.value.getContext('webgl2')
+    const mainCtx = canvas.value.getContext('bitmaprenderer')
+    if (gl === null) {
+        throw new Error()
+    }
 
     //--------------------------------
     // Create programs
@@ -101,6 +106,7 @@ onMounted(() => {
         oldPosition: gl.getAttribLocation(updatePositionProgram, 'oldPosition'),
         oldVelocity: gl.getAttribLocation(updatePositionProgram, 'oldVelocity'),
         canvasDimensions: gl.getUniformLocation(updatePositionProgram, 'canvasDimensions'),
+        time: gl.getUniformLocation(updatePositionProgram, 'time'),
         deltaTime: gl.getUniformLocation(updatePositionProgram, 'deltaTime'),
     };
 
@@ -120,10 +126,10 @@ onMounted(() => {
         }
         return Math.random() * (max - min) + min;
     };
-    const numParticles = 1024 * 128;
+    const numParticles = 1024 * 1024;
     const createPoints = (num: number, ranges: any[]) =>
         new Array(num).fill(0).map(_ => ranges.map(range => rand(range[0], range[1]))).flat();
-    const positions = new Float32Array(createPoints(numParticles, [[0, canvas.value.width], [0, canvas.value.height]]));
+    const positions = new Float32Array(createPoints(numParticles, [[-0.5 * canvas.value.width, 0.5 * canvas.value.width], [-0.5 * canvas.value.height, 0.5 * canvas.value.height]]));
     const velocities = new Float32Array(createPoints(numParticles, [[0, 0], [0, 0]]));
 
     // GPU buffers
@@ -174,6 +180,10 @@ onMounted(() => {
     //================================
     let then = 0;
     function render(time: number) {
+        if (gl === null) {
+            throw new Error()
+        }
+
         // convert to seconds
         time *= 0.001;
         // Subtract the previous time from the current time
@@ -183,6 +193,7 @@ onMounted(() => {
 
         gl.clearColor(0, 0, 0, 1);
         gl.clear(gl.COLOR_BUFFER_BIT);
+        gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
         //--------------------------------
         // Update positions using transform feedback
@@ -202,6 +213,7 @@ onMounted(() => {
         gl.useProgram(updatePositionProgram);
         gl.bindVertexArray(current.updateVA);
         gl.uniform2f(updatePositionPrgLocs.canvasDimensions, gl.canvas.width, gl.canvas.height);
+        gl.uniform1f(updatePositionPrgLocs.time, time);
         gl.uniform1f(updatePositionPrgLocs.deltaTime, deltaTime);
 
         gl.enable(gl.RASTERIZER_DISCARD);
@@ -218,6 +230,7 @@ onMounted(() => {
         //--------------------------------
         // Draw particles
         //--------------------------------
+        gl.enable(gl.BLEND);
         gl.useProgram(drawParticlesProgram);
 
         gl.bindVertexArray(current.drawVA);
@@ -232,6 +245,11 @@ onMounted(() => {
         ].flat()
         gl.uniformMatrix4fv(drawParticlesProgLocs.matrix, false, matrix);
         gl.drawArrays(gl.POINTS, 0, numParticles);
+
+        //--------------------------------
+        // Copy offscreen render result to main canvas
+        //--------------------------------
+        mainCtx.transferFromImageBitmap(offscreenCanvas.transferToImageBitmap())
 
         //--------------------------------
         // Swap buffers
@@ -256,17 +274,19 @@ onMounted(() => {
     // }
 
     window.requestAnimationFrame(render)
-})
 
-// watch(
-//     [app],
-//     () => {
-//         // canvas.value.width = app.value.width
-//         // canvas.value.height = app.value.height
-//         // window.requestAnimationFrame(draw)
-//     },
-//     { deep: true }
-// )
+    watch(
+        [app],
+        () => {
+            canvas.value.width = app.value.width
+            canvas.value.height = app.value.height
+            offscreenCanvas.width = app.value.width
+            offscreenCanvas.height = app.value.height
+            window.requestAnimationFrame(render)
+        },
+        { deep: true }
+    )
+})
 </script>
 
 <template>
