@@ -5,10 +5,10 @@ import { onMounted, ref, watch, type Ref } from 'vue'
 import { app, fps, parameter } from './main'
 
 // Shaders
-import updatePositionVS from './glsl/updatePosition.vert'
-import updatePositionFS from './glsl/updatePosition.frag'
-import drawParticlesVS from './glsl/drawParticles.vert'
-import drawParticlesFS from './glsl/drawParticles.frag'
+import updatePositionVS from './glsl/updatePosition.vert?raw'
+import updatePositionFS from './glsl/updatePosition.frag?raw'
+import drawParticlesVS from './glsl/drawParticles.vert?raw'
+import drawParticlesFS from './glsl/drawParticles.frag?raw'
 import { normalDistribution, vec, Vec, vecRad } from './math'
 
 //--------------------------------
