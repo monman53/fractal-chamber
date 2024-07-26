@@ -90,7 +90,6 @@ const offscreenCanvas = new OffscreenCanvas(app.value.width, app.value.height)
 const gl = offscreenCanvas.getContext('webgl2', { alpha: true })
 const canvas = ref()
 onMounted(() => {
-  let hoge = 0
   // const gl = canvas.value.getContext('webgl2')
   const mainCtx = canvas.value.getContext('bitmaprenderer')
   if (gl === null) {
@@ -206,6 +205,7 @@ onMounted(() => {
   //================================
   // Frame render function
   //================================
+  let hoge = 0
   let then = 0
   function render(time: number) {
     if (gl === null) {
@@ -262,8 +262,7 @@ onMounted(() => {
       const s = vec(Math.random() * canvas.value.width, Math.random() * canvas.value.height)
       const v = vecRad(Math.random() * 2 * Math.PI)
 
-      const n = 1024 * 2
-      hoge = (hoge + n) % numParticles
+      const n = Math.min(1024 * 2, numParticles)
       const length = parameter.value.length + normalDistribution() * parameter.value.lengthStd
       for (let i = 0; i < n * 3; i += 3) {
         const t = s.add(v.mul(Math.random() * length))
@@ -272,15 +271,18 @@ onMounted(() => {
         positions[i + 2] = 0
       }
       gl.bindBuffer(gl.ARRAY_BUFFER, current.buffer)
+      //   if (hoge + n > numParticles) {
+      //   } else {
       gl.bufferSubData(gl.ARRAY_BUFFER, hoge * 4 * 3, positions, 0, n * 3)
+      //   }
       gl.bindBuffer(gl.ARRAY_BUFFER, current.velocityBuffer)
       gl.bufferSubData(gl.ARRAY_BUFFER, hoge * 4 * 3, velocities, 0, n * 3)
       gl.bindBuffer(gl.ARRAY_BUFFER, null)
+      hoge = (hoge + n) % numParticles
     }
 
-    if (true) {
+    {
       const n = 128
-      hoge = (hoge + n) % numParticles
       for (let i = 0; i < n * 3; i += 3) {
         positions[i] = Math.random() * canvas.value.width
         positions[i + 1] = Math.random() * canvas.value.height
@@ -291,7 +293,7 @@ onMounted(() => {
       gl.bindBuffer(gl.ARRAY_BUFFER, current.velocityBuffer)
       gl.bufferSubData(gl.ARRAY_BUFFER, hoge * 4 * 3, velocities, 0, n * 3)
       gl.bindBuffer(gl.ARRAY_BUFFER, null)
-      //   hoge = 1
+      hoge = (hoge + n) % numParticles
     }
 
     gl.bindVertexArray(current.drawVA)
