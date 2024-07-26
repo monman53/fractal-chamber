@@ -91,7 +91,7 @@ const offscreenCanvas = new OffscreenCanvas(app.value.width, app.value.height)
 const gl = offscreenCanvas.getContext('webgl2', { alpha: true })
 const canvas = ref()
 onMounted(() => {
-    // let hoge = 0
+    let hoge = 0
     // const gl = canvas.value.getContext('webgl2')
     const mainCtx = canvas.value.getContext('bitmaprenderer')
     if (gl === null) {
@@ -135,7 +135,7 @@ onMounted(() => {
         }
         return Math.random() * (max - min) + min;
     };
-    const numParticles = 1024 * 1024;
+    const numParticles = 1024 * 1024 * 4;
     const createPoints = (num: number, ranges: any[]) =>
         new Array(num).fill(0).map(_ => ranges.map(range => rand(range[0], range[1]))).flat();
     const positions = new Float32Array(createPoints(numParticles, [[-0.5 * canvas.value.width, 0.5 * canvas.value.width], [-0.5 * canvas.value.height, 0.5 * canvas.value.height]]));
@@ -208,17 +208,6 @@ onMounted(() => {
         //--------------------------------
         // Update positions using transform feedback
         //--------------------------------
-        // if (Math.random() < 0.01) {
-        //     gl.bindBuffer(gl.ARRAY_BUFFER, next.buffer);
-        //     const n = numParticles / 16
-        //     hoge = (hoge + n) % numParticles
-        //     // const n = 1
-        //     for (let i = 0; i < n * 2; i++) {
-        //         positions[i] = 0
-        //     }
-        //     gl.bufferSubData(gl.ARRAY_BUFFER, hoge * 4 * 2, positions, 0, n * 2);
-        //     gl.bindBuffer(gl.ARRAY_BUFFER, null);
-        // }
         // compute the new positions
         gl.useProgram(updatePositionProgram);
         gl.bindVertexArray(current.updateVA);
@@ -246,6 +235,17 @@ onMounted(() => {
         //--------------------------------
         gl.enable(gl.BLEND);
         gl.useProgram(drawParticlesProgram);
+        if (Math.random() < 0.05) {
+            gl.bindBuffer(gl.ARRAY_BUFFER, next.buffer);
+            const n = numParticles / 32
+            hoge = (hoge + n) % numParticles
+            // const n = 1
+            for (let i = 0; i < n * 2; i++) {
+                positions[i] = i / 1000
+            }
+            gl.bufferSubData(gl.ARRAY_BUFFER, hoge * 4 * 2, positions, 0, n * 2);
+            gl.bindBuffer(gl.ARRAY_BUFFER, null);
+        }
 
         gl.bindVertexArray(current.drawVA);
 
