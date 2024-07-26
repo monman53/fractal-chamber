@@ -15,8 +15,8 @@ import { humanReadable } from './utils'
         type="range"
         v-model.number="parameter.simplexResolution"
         :step="0.0001"
-        :min="0.001"
-        :max="0.03"
+        :min="0.0"
+        :max="0.01"
       /><br />
     </label>
     <label>
@@ -24,9 +24,9 @@ import { humanReadable } from './utils'
       <input
         type="range"
         v-model.number="parameter.simplexTimeScale"
-        :step="0.01"
+        :step="0.001"
         :min="0.0"
-        :max="4"
+        :max="1"
       /><br />
     </label>
     <label>

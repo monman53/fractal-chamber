@@ -2,7 +2,7 @@
 
 #include ./utils.glsl
 vec4 openSimplex2SDerivatives_ImproveXY(vec3);
-float rand(vec2);
+float noise(vec2);
 
 in vec3 oldPosition;
 in vec3 oldVelocity;
@@ -41,7 +41,15 @@ void main() {
     newPosition.z = oldPosition.z + oldVelocity.z * deltaTime;
     float m = 1.0f;
     vec3 accel;
-    accel.xy = simplexScale * random.xy - k / m * oldVelocity.xy + vec2(rand(oldPosition.xy) - 0.5f, rand(oldPosition.xy + 0.1f) - 0.5f) * diffusion;
+    vec2 D = vec2(noise(oldPosition.xy) - 0.5f, noise(oldPosition.xy + 0.1f) - 0.5f) * diffusion;
+    accel.xy = simplexScale * random.xy - k / m * oldVelocity.xy + D;
     accel.z = gravity;
     newVelocity = oldVelocity + accel * deltaTime;
+
+    // if(noise(oldPosition.xy + 0.2f) < 0.001f) {
+    //     newVelocity = vec3(0.f);
+    //     newPosition.z = 0.f;
+    //     // newPosition.x = noise(oldPosition.xy + vec2(0.3f, 0.4f)) * canvasDimensions.x;
+    //     // newPosition.y = noise(oldPosition.xy + vec2(0.5f, 0.6f)) * canvasDimensions.y;
+    // }
 }

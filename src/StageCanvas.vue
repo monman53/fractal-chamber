@@ -257,20 +257,32 @@ onMounted(() => {
     //--------------------------------
     gl.enable(gl.BLEND)
     gl.useProgram(drawParticlesProgram)
-    if (Math.random() < 0.1) {
-      // if (hoge === 0) {
+
+    if (Math.random() < 0.2) {
       const s = vec(Math.random() * canvas.value.width, Math.random() * canvas.value.height)
-      // const v = vecRad(Math.random() * 2 * Math.PI).mul(parameter.value.length)
       const v = vecRad(Math.random() * 2 * Math.PI)
 
-      //   const n = numParticles / 128 / 2
-      const n = 1024
+      const n = 1024 * 2
       hoge = (hoge + n) % numParticles
-      // const n = 1
       for (let i = 0; i < n * 3; i += 3) {
         const t = s.add(v.mul(Math.random() * parameter.value.length))
         positions[i] = t.x
         positions[i + 1] = t.y
+        positions[i + 2] = 0
+      }
+      gl.bindBuffer(gl.ARRAY_BUFFER, current.buffer)
+      gl.bufferSubData(gl.ARRAY_BUFFER, hoge * 4 * 3, positions, 0, n * 3)
+      gl.bindBuffer(gl.ARRAY_BUFFER, current.velocityBuffer)
+      gl.bufferSubData(gl.ARRAY_BUFFER, hoge * 4 * 3, velocities, 0, n * 3)
+      gl.bindBuffer(gl.ARRAY_BUFFER, null)
+    }
+
+    if (true) {
+      const n = 128
+      hoge = (hoge + n) % numParticles
+      for (let i = 0; i < n * 3; i += 3) {
+        positions[i] = Math.random() * canvas.value.width
+        positions[i + 1] = Math.random() * canvas.value.height
         positions[i + 2] = 0
       }
       gl.bindBuffer(gl.ARRAY_BUFFER, current.buffer)
