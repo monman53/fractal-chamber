@@ -12,14 +12,14 @@ export const app = ref({
 export const fps = ref(0)
 
 export const parameter = ref({
-  simplexResolution: 0.005,
-  simplexScale: 5.0,
+  simplexResolution: 0.002,
+  simplexScale: 10,
   simplexTimeScale: 0.001,
-  k: 1.1,
+  k: 1.0,
   opacity: 0.5,
-  length: 150,
-  lengthStd: 50,
-  diffusion: 250,
+  length: 300,
+  lengthStd: 100,
+  diffusion: 500,
   gravity: -1.0,
   density: 10,
   densityStd: 2,
@@ -60,7 +60,7 @@ export const parameterProps = ref({
   diffusion: {
     type: 'range',
     min: 0,
-    max: 500,
+    max: 1000,
     step: 0.01
   },
   opacity: {

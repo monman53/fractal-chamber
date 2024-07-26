@@ -258,7 +258,10 @@ onMounted(() => {
     gl.useProgram(drawParticlesProgram)
 
     if (Math.random() < parameter.value.frequency) {
-      const s = vec(Math.random() * canvas.value.width, Math.random() * canvas.value.height)
+      const s = vec(
+        (Math.random() - 0.5) * 2 * canvas.value.width,
+        (Math.random() - 0.5) * 2 * canvas.value.height
+      )
       const v = vecRad(Math.random() * 2 * Math.PI)
 
       const length = Math.max(
@@ -297,8 +300,8 @@ onMounted(() => {
     {
       const n = 128
       for (let i = 0; i < n * 3; i += 3) {
-        positions[i] = Math.random() * canvas.value.width
-        positions[i + 1] = Math.random() * canvas.value.height
+        positions[i] = (Math.random() - 0.5) * 2 * canvas.value.width
+        positions[i + 1] = (Math.random() - 0.5) * 2 * canvas.value.height
         positions[i + 2] = 0
       }
       if (hoge + n > numParticles) {
@@ -324,8 +327,8 @@ onMounted(() => {
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height)
 
     const matrix = [
-      [2 / canvas.value.width, 0, 0, 0],
-      [0, 2 / canvas.value.height, 0, 0],
+      [1 / canvas.value.width, 0, 0, 0],
+      [0, 1 / canvas.value.height, 0, 0],
       [0, 0, 1, 0],
       [0, 0, 0, 1]
     ].flat()
