@@ -44,6 +44,26 @@ import { humanReadable } from './utils'
       <input type="range" v-model.number="parameter.k" :step="0.01" :min="0.0" :max="10" /><br />
     </label>
     <label>
+      gravity: {{ humanReadable(parameter.gravity) }}<br />
+      <input
+        type="range"
+        v-model.number="parameter.gravity"
+        :step="0.01"
+        :min="-10"
+        :max="0"
+      /><br />
+    </label>
+    <label>
+      diffusion: {{ humanReadable(parameter.diffusion) }}<br />
+      <input
+        type="range"
+        v-model.number="parameter.diffusion"
+        :step="0.01"
+        :min="0"
+        :max="500"
+      /><br />
+    </label>
+    <label>
       Opacity: {{ humanReadable(parameter.opacity) }}<br />
       <input
         type="range"

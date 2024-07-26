@@ -3,7 +3,12 @@
 in vec4 position;
 uniform mat4 matrix;
 
+out vec3 hoge;
+
 void main() {
-    gl_Position = matrix * position + vec4(-0.f, -0.f, 0.f, 0.f);
+    vec4 pos = matrix * position;
+    hoge = pos.xyz;
+    gl_Position = vec4(pos.xy, 0, 1);
+    // gl_Position = pos;
     gl_PointSize = 1.0f;
 }

@@ -5,6 +5,9 @@ out vec4 outColor;
 
 uniform float opacity;
 
+in vec3 hoge;
+
 void main() {
-    outColor = vec4(1, 1, 1, opacity);
+    float alpha = opacity * exp(hoge.z);
+    outColor = vec4(1.0f, 1.0f, 1.0f, alpha);
 }

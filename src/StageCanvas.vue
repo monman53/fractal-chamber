@@ -79,7 +79,7 @@ function makeVertexArray(gl: WebGL2RenderingContext, bufLocPairs: any) {
     gl.enableVertexAttribArray(loc)
     gl.vertexAttribPointer(
       loc, // attribute location
-      2, // number of elements
+      3, // number of elements
       gl.FLOAT, // type of data
       false, // normalize
       0, // stride (0 = auto)
@@ -118,7 +118,9 @@ onMounted(() => {
     simplexResolution: gl.getUniformLocation(updatePositionProgram, 'simplexResolution'),
     simplexScale: gl.getUniformLocation(updatePositionProgram, 'simplexScale'),
     simplexTimeScale: gl.getUniformLocation(updatePositionProgram, 'simplexTimeScale'),
-    k: gl.getUniformLocation(updatePositionProgram, 'k')
+    k: gl.getUniformLocation(updatePositionProgram, 'k'),
+    diffusion: gl.getUniformLocation(updatePositionProgram, 'diffusion'),
+    gravity: gl.getUniformLocation(updatePositionProgram, 'gravity')
   }
 
   const drawParticlesProgLocs = {
@@ -138,7 +140,7 @@ onMounted(() => {
     }
     return Math.random() * (max - min) + min
   }
-  const numParticles = 1024 * 1024
+  const numParticles = 1024 * 64 * 3
   const createPoints = (num: number, ranges: any[]) =>
     new Array(num)
       .fill(0)
@@ -147,11 +149,13 @@ onMounted(() => {
   const positions = new Float32Array(
     createPoints(numParticles, [
       [-0.5 * canvas.value.width, 0.5 * canvas.value.width],
-      [-0.5 * canvas.value.height, 0.5 * canvas.value.height]
+      [-0.5 * canvas.value.height, 0.5 * canvas.value.height],
+      [-1000, -1000]
     ])
   )
   const velocities = new Float32Array(
     createPoints(numParticles, [
+      [0, 0],
       [0, 0],
       [0, 0]
     ])
@@ -234,6 +238,8 @@ onMounted(() => {
     gl.uniform1f(updatePositionPrgLocs.simplexScale, parameter.value.simplexScale)
     gl.uniform1f(updatePositionPrgLocs.simplexTimeScale, parameter.value.simplexTimeScale)
     gl.uniform1f(updatePositionPrgLocs.k, parameter.value.k)
+    gl.uniform1f(updatePositionPrgLocs.diffusion, parameter.value.diffusion)
+    gl.uniform1f(updatePositionPrgLocs.gravity, parameter.value.gravity)
 
     gl.enable(gl.RASTERIZER_DISCARD)
 
@@ -251,24 +257,28 @@ onMounted(() => {
     //--------------------------------
     gl.enable(gl.BLEND)
     gl.useProgram(drawParticlesProgram)
-    if (Math.random() < 0.5) {
+    if (Math.random() < 0.1) {
+      // if (hoge === 0) {
       const s = vec(Math.random() * canvas.value.width, Math.random() * canvas.value.height)
       // const v = vecRad(Math.random() * 2 * Math.PI).mul(parameter.value.length)
       const v = vecRad(Math.random() * 2 * Math.PI)
 
-      const n = numParticles / 128 / 2
+      //   const n = numParticles / 128 / 2
+      const n = 1024
       hoge = (hoge + n) % numParticles
       // const n = 1
-      for (let i = 0; i < n * 2; i += 2) {
+      for (let i = 0; i < n * 3; i += 3) {
         const t = s.add(v.mul(Math.random() * parameter.value.length))
         positions[i] = t.x
         positions[i + 1] = t.y
+        positions[i + 2] = 0
       }
       gl.bindBuffer(gl.ARRAY_BUFFER, current.buffer)
-      gl.bufferSubData(gl.ARRAY_BUFFER, hoge * 4 * 2, positions, 0, n * 2)
+      gl.bufferSubData(gl.ARRAY_BUFFER, hoge * 4 * 3, positions, 0, n * 3)
       gl.bindBuffer(gl.ARRAY_BUFFER, current.velocityBuffer)
-      gl.bufferSubData(gl.ARRAY_BUFFER, hoge * 4 * 2, velocities, 0, n * 2)
+      gl.bufferSubData(gl.ARRAY_BUFFER, hoge * 4 * 3, velocities, 0, n * 3)
       gl.bindBuffer(gl.ARRAY_BUFFER, null)
+      //   hoge = 1
     }
 
     gl.bindVertexArray(current.drawVA)

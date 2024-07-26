@@ -10,12 +10,14 @@ export const app = ref({
 })
 
 export const parameter = ref({
-  simplexResolution: 0.01,
+  simplexResolution: 0.005,
   simplexScale: 10.0,
   simplexTimeScale: 1.0,
   k: 1.1,
-  opacity: 0.05,
-  length: 100
+  opacity: 0.5,
+  length: 100,
+  diffusion: 200,
+  gravity: -4.0
 })
 
 const resize = () => {
