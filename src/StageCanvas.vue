@@ -257,12 +257,18 @@ onMounted(() => {
     gl.enable(gl.BLEND)
     gl.useProgram(drawParticlesProgram)
 
-    if (Math.random() < 0.1) {
+    if (Math.random() < parameter.value.frequency) {
       const s = vec(Math.random() * canvas.value.width, Math.random() * canvas.value.height)
       const v = vecRad(Math.random() * 2 * Math.PI)
 
-      const length = parameter.value.length + normalDistribution() * parameter.value.lengthStd
-      const density = parameter.value.density + normalDistribution() * parameter.value.densityStd
+      const length = Math.max(
+        0,
+        parameter.value.length + normalDistribution() * parameter.value.lengthStd
+      )
+      const density = Math.max(
+        0,
+        parameter.value.density + normalDistribution() * parameter.value.densityStd
+      )
       const n = Math.floor(Math.min(length * density, numParticles))
       for (let i = 0; i < n * 3; i += 3) {
         const t = s.add(v.mul(Math.random() * length))
