@@ -11,20 +11,29 @@ import drawParticlesFS from './glsl/drawParticles.frag'
 //--------------------------------
 // WebGL support functions
 //--------------------------------
-function createShader(gl: any, type: any, src: any) {
+const createShader = (gl: WebGL2RenderingContext, type: GLenum, src: string) => {
     const shader = gl.createShader(type);
+    if (!shader) {
+        throw new Error()
+    }
     gl.shaderSource(shader, src);
     gl.compileShader(shader);
-    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-        throw new Error(gl.getShaderInfoLog(shader));
-    }
+    // if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+    //     throw new Error(gl.getShaderInfoLog(shader));
+    // }
     return shader;
 }
 
-function createProgram(gl: any, shaderSources: any, transformFeedbackVaryings: any) {
+function createProgram(gl: WebGL2RenderingContext, shaderSources: string[], transformFeedbackVaryings: any) {
     const program = gl.createProgram();
+    if (!program) {
+        throw new Error()
+    }
     [gl.VERTEX_SHADER, gl.FRAGMENT_SHADER].forEach((type, ndx) => {
         const shader = createShader(gl, type, shaderSources[ndx]);
+        if (!shader) {
+            throw new Error()
+        }
         gl.attachShader(program, shader);
     });
     if (transformFeedbackVaryings) {
@@ -35,27 +44,29 @@ function createProgram(gl: any, shaderSources: any, transformFeedbackVaryings: a
         );
     }
     gl.linkProgram(program);
-    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-        throw new Error(gl.getProgramParameter(program));
-    }
+    // if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+    //     throw new Error(gl.getProgramParameter(program));
+    // }
     return program;
 }
 
-function makeBuffer(gl: any, sizeOrData: any, usage: any) {
+function makeBuffer(gl: WebGL2RenderingContext, sizeOrData: any, usage: GLenum) {
     const buf = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, buf);
     gl.bufferData(gl.ARRAY_BUFFER, sizeOrData, usage);
     return buf;
 }
 
-function makeTransformFeedback(gl: any, buffer: any) {
+function makeTransformFeedback(gl: any, buffers: any[]) {
     const tf = gl.createTransformFeedback();
     gl.bindTransformFeedback(gl.TRANSFORM_FEEDBACK, tf);
-    gl.bindBufferBase(gl.TRANSFORM_FEEDBACK_BUFFER, 0, buffer);
+    buffers.forEach((buffer, idx) => {
+        gl.bindBufferBase(gl.TRANSFORM_FEEDBACK_BUFFER, idx, buffer);
+    })
     return tf;
 }
 
-function makeVertexArray(gl: any, bufLocPairs: any) {
+function makeVertexArray(gl: WebGL2RenderingContext, bufLocPairs: any) {
     const va = gl.createVertexArray();
     gl.bindVertexArray(va);
     for (const [buffer, loc] of bufLocPairs) {
@@ -82,13 +93,13 @@ onMounted(() => {
     // Create programs
     //--------------------------------
     const updatePositionProgram = createProgram(
-        gl, [updatePositionVS, updatePositionFS], ['newPosition']);
+        gl, [updatePositionVS, updatePositionFS], ['newPosition', 'newVelocity']);
     const drawParticlesProgram = createProgram(
         gl, [drawParticlesVS, drawParticlesFS], []);
 
     const updatePositionPrgLocs = {
         oldPosition: gl.getAttribLocation(updatePositionProgram, 'oldPosition'),
-        velocity: gl.getAttribLocation(updatePositionProgram, 'velocity'),
+        oldVelocity: gl.getAttribLocation(updatePositionProgram, 'oldVelocity'),
         canvasDimensions: gl.getUniformLocation(updatePositionProgram, 'canvasDimensions'),
         deltaTime: gl.getUniformLocation(updatePositionProgram, 'deltaTime'),
     };
@@ -101,6 +112,7 @@ onMounted(() => {
     //--------------------------------
     // Create buffers
     //--------------------------------
+    // CPU initial buffers
     const rand = (min: any, max: any) => {
         if (max === undefined) {
             max = min;
@@ -112,20 +124,22 @@ onMounted(() => {
     const createPoints = (num: number, ranges: any[]) =>
         new Array(num).fill(0).map(_ => ranges.map(range => rand(range[0], range[1]))).flat();
     const positions = new Float32Array(createPoints(numParticles, [[0, canvas.value.width], [0, canvas.value.height]]));
-    const velocities = new Float32Array(createPoints(numParticles, [[-30, 30], [-30, 30]]));
+    const velocities = new Float32Array(createPoints(numParticles, [[0, 0], [0, 0]]));
 
+    // GPU buffers
     const position1Buffer = makeBuffer(gl, positions, gl.DYNAMIC_DRAW);
     const position2Buffer = makeBuffer(gl, positions, gl.DYNAMIC_DRAW);
-    const velocityBuffer = makeBuffer(gl, velocities, gl.STATIC_DRAW);
+    const velocity1Buffer = makeBuffer(gl, velocities, gl.DYNAMIC_DRAW);
+    const velocity2Buffer = makeBuffer(gl, velocities, gl.DYNAMIC_DRAW);
 
     // Vertex arrays for updater
     const updatePositionVA1 = makeVertexArray(gl, [
         [position1Buffer, updatePositionPrgLocs.oldPosition],
-        [velocityBuffer, updatePositionPrgLocs.velocity],
+        [velocity1Buffer, updatePositionPrgLocs.oldVelocity],
     ]);
     const updatePositionVA2 = makeVertexArray(gl, [
         [position2Buffer, updatePositionPrgLocs.oldPosition],
-        [velocityBuffer, updatePositionPrgLocs.velocity],
+        [velocity2Buffer, updatePositionPrgLocs.oldVelocity],
     ]);
 
     // Vertex arrays for drawer
@@ -134,8 +148,8 @@ onMounted(() => {
     const drawVA2 = makeVertexArray(
         gl, [[position2Buffer, drawParticlesProgLocs.position]]);
 
-    const tf1 = makeTransformFeedback(gl, position1Buffer);
-    const tf2 = makeTransformFeedback(gl, position2Buffer);
+    const tf1 = makeTransformFeedback(gl, [position1Buffer, velocity1Buffer]);
+    const tf2 = makeTransformFeedback(gl, [position2Buffer, velocity2Buffer]);
 
     // For ping-pong buffering
     let current = {
@@ -173,6 +187,17 @@ onMounted(() => {
         //--------------------------------
         // Update positions using transform feedback
         //--------------------------------
+        // if (Math.random() < 0.01) {
+        //     gl.bindBuffer(gl.ARRAY_BUFFER, next.buffer);
+        //     const n = numParticles / 16
+        //     hoge = (hoge + n) % numParticles
+        //     // const n = 1
+        //     for (let i = 0; i < n * 2; i++) {
+        //         positions[i] = 0
+        //     }
+        //     gl.bufferSubData(gl.ARRAY_BUFFER, hoge * 4 * 2, positions, 0, n * 2);
+        //     gl.bindBuffer(gl.ARRAY_BUFFER, null);
+        // }
         // compute the new positions
         gl.useProgram(updatePositionProgram);
         gl.bindVertexArray(current.updateVA);
@@ -196,17 +221,6 @@ onMounted(() => {
         gl.useProgram(drawParticlesProgram);
 
         gl.bindVertexArray(current.drawVA);
-        if (Math.random() < 0.01) {
-            gl.bindBuffer(gl.ARRAY_BUFFER, next.buffer);
-            const n = numParticles / 16
-            hoge = (hoge + n) % numParticles
-            // const n = 1
-            for (let i = 0; i < n * 2; i++) {
-                positions[i] = 0
-            }
-            gl.bufferSubData(gl.ARRAY_BUFFER, hoge * 4 * 2, positions, 0, n * 2);
-            gl.bindBuffer(gl.ARRAY_BUFFER, null);
-        }
 
         gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 

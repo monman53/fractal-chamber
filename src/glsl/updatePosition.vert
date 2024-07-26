@@ -1,12 +1,13 @@
 #version 300 es
 
 in vec2 oldPosition;
-in vec2 velocity;
+in vec2 oldVelocity;
 
 uniform float deltaTime;
 uniform vec2 canvasDimensions;
 
 out vec2 newPosition;
+out vec2 newVelocity;
 
 vec2 euclideanModulo(vec2 n, vec2 m) {
     if(n.x > m.x * 0.5f) {
@@ -24,5 +25,6 @@ vec2 euclideanModulo(vec2 n, vec2 m) {
 }
 
 void main() {
-    newPosition = euclideanModulo(oldPosition + velocity * deltaTime, canvasDimensions);
+    newPosition = euclideanModulo(oldPosition + oldVelocity * deltaTime, canvasDimensions);
+    newVelocity = oldVelocity + vec2(0.01f);
 }
