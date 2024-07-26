@@ -1,6 +1,17 @@
 <script setup lang="ts">
 import { fps, parameter, parameterProps } from './main'
 import { humanReadable } from './utils'
+
+const fractalMode = () => {
+  parameter.value.densityStd = 0
+  parameter.value.diffusion = 0
+  parameter.value.density = 1
+  parameter.value.opacity = 0.1
+  parameter.value.gravity = -2
+  parameter.value.length = 500
+  parameter.value.frequency = 0.02
+  parameter.value.nIter = 7
+}
 </script>
 
 <template>
@@ -23,6 +34,7 @@ import { humanReadable } from './utils'
         <br />
       </template>
     </template>
+    <button @click="fractalMode">fractal mode</button>
   </div>
 </template>
 

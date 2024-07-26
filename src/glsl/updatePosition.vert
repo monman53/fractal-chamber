@@ -118,8 +118,7 @@ out vec3 newVelocity;
 
 void main() {
     vec4 random = openSimplex2SDerivatives_ImproveXY(vec3(oldPosition.xy * simplexResolution, time * simplexTimeScale));
-    newPosition.xy = oldPosition.xy + oldVelocity.xy * deltaTime, canvasDimensions;
-    newPosition.z = oldPosition.z + oldVelocity.z * deltaTime;
+    newPosition = oldPosition + oldVelocity * deltaTime;
     float m = 1.0f;
     vec3 accel;
     vec2 D = vec2(noise(oldPosition.xy) - 0.5f, noise(oldPosition.xy + 0.1f) - 0.5f) * diffusion;

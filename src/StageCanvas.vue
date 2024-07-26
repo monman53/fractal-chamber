@@ -137,7 +137,7 @@ onMounted(() => {
     }
     return Math.random() * (max - min) + min
   }
-  const numParticles = 1024 * 1024
+  const numParticles = 1024 * 1024 * 4
   const createPoints = (num: number, ranges: any[]) =>
     new Array(num)
       .fill(0)
@@ -258,12 +258,12 @@ onMounted(() => {
     gl.useProgram(drawParticlesProgram)
 
     if (Math.random() < parameter.value.frequency) {
+      // Base segment
       const s = vec(
         (Math.random() - 0.5) * 2 * canvas.value.width,
         (Math.random() - 0.5) * 2 * canvas.value.height
       )
       const v = vecRad(Math.random() * 2 * Math.PI)
-
       const length = Math.max(
         0,
         parameter.value.length + normalDistribution() * parameter.value.lengthStd
@@ -272,13 +272,56 @@ onMounted(() => {
         0,
         parameter.value.density + normalDistribution() * parameter.value.densityStd
       )
-      const n = Math.floor(Math.min(length * density, numParticles))
-      for (let i = 0; i < n * 3; i += 3) {
-        const t = s.add(v.mul(Math.random() * length))
-        positions[i] = t.x
-        positions[i + 1] = t.y
-        positions[i + 2] = 0
+
+      //--------------------------------
+      // L-system
+      //--------------------------------
+      // Rule
+      const m = 4
+      const rules: any[] = []
+      for (let i = 0; i < m; i++) {
+        rules.push({ angle: normalDistribution() * 0.3, ratio: Math.random() })
       }
+      // rules.sort((a, b) => a.ratio - b.ratio)
+      // Iteration
+      let edges = [{ s: s, v: v.mul(length) }]
+      for (let i = 0; i < parameter.value.nIter; i++) {
+        edges = edges
+          .map((edge) => {
+            let ts = [edge.s]
+            rules.forEach((rule) => {
+              const t = edge.s.add(edge.v.mul(rule.ratio).rotate(rule.angle))
+              ts.push(t)
+            })
+            ts.push(edge.s.add(edge.v))
+
+            const res = []
+            for (let j = 1; j < ts.length; j++) {
+              const s = ts[j - 1]
+              const t = ts[j]
+              res.push({ s: s, v: t.sub(s) })
+            }
+            return res
+          })
+          .flat()
+      }
+
+      let n = 0
+      edges.forEach((edge) => {
+        const length = edge.v.length()
+        const m = Math.floor(edge.v.length() * density)
+        for (let i = 0; i < m; i += 1) {
+          if (n >= numParticles) {
+            continue
+          }
+          const t = edge.s.add(edge.v.mul(Math.random()))
+          positions[3 * n] = t.x
+          positions[3 * n + 1] = t.y
+          positions[3 * n + 2] = 0
+          n += 1
+        }
+      })
+
       if (hoge + n > numParticles) {
         const m = numParticles - hoge
         const rest = n - m
@@ -299,6 +342,7 @@ onMounted(() => {
 
     {
       const n = 128
+      // const n = 0
       for (let i = 0; i < n * 3; i += 3) {
         positions[i] = (Math.random() - 0.5) * 2 * canvas.value.width
         positions[i + 1] = (Math.random() - 0.5) * 2 * canvas.value.height

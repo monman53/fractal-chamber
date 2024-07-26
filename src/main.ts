@@ -21,9 +21,10 @@ export const parameter = ref({
   lengthStd: 100,
   diffusion: 500,
   gravity: -1.0,
-  density: 10,
+  density: 2,
   densityStd: 2,
-  frequency: 0.1
+  frequency: 0.1,
+  nIter: 0
 })
 
 export const parameterProps = ref({
@@ -72,7 +73,7 @@ export const parameterProps = ref({
   density: {
     type: 'range',
     min: 0,
-    max: 50,
+    max: 20,
     step: 0.001
   },
   densityStd: {
@@ -98,6 +99,12 @@ export const parameterProps = ref({
     min: 0,
     max: 1,
     step: 0.001
+  },
+  nIter: {
+    type: 'range',
+    min: 0,
+    max: 10,
+    step: 1
   }
 })
 
