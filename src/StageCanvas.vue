@@ -137,7 +137,7 @@ onMounted(() => {
     }
     return Math.random() * (max - min) + min
   }
-  const numParticles = 1024 * 1024 * 3
+  const numParticles = 1024 * 1024
   const createPoints = (num: number, ranges: any[]) =>
     new Array(num)
       .fill(0)
@@ -217,7 +217,6 @@ onMounted(() => {
     // Subtract the previous time from the current time
     const deltaTime = time - then
     fps.value = 1.0 / deltaTime
-    console.log(deltaTime)
     // Remember the current time for the next frame.
     then = time
 
@@ -262,22 +261,30 @@ onMounted(() => {
       const s = vec(Math.random() * canvas.value.width, Math.random() * canvas.value.height)
       const v = vecRad(Math.random() * 2 * Math.PI)
 
-      const n = Math.min(1024 * 2, numParticles)
       const length = parameter.value.length + normalDistribution() * parameter.value.lengthStd
+      const density = parameter.value.density + normalDistribution() * parameter.value.densityStd
+      const n = Math.floor(Math.min(length * density, numParticles))
       for (let i = 0; i < n * 3; i += 3) {
         const t = s.add(v.mul(Math.random() * length))
         positions[i] = t.x
         positions[i + 1] = t.y
         positions[i + 2] = 0
       }
-      gl.bindBuffer(gl.ARRAY_BUFFER, current.buffer)
-      //   if (hoge + n > numParticles) {
-      //   } else {
-      gl.bufferSubData(gl.ARRAY_BUFFER, hoge * 4 * 3, positions, 0, n * 3)
-      //   }
-      gl.bindBuffer(gl.ARRAY_BUFFER, current.velocityBuffer)
-      gl.bufferSubData(gl.ARRAY_BUFFER, hoge * 4 * 3, velocities, 0, n * 3)
-      gl.bindBuffer(gl.ARRAY_BUFFER, null)
+      if (hoge + n > numParticles) {
+        const m = numParticles - hoge
+        const rest = n - m
+        gl.bindBuffer(gl.ARRAY_BUFFER, current.buffer)
+        gl.bufferSubData(gl.ARRAY_BUFFER, hoge * 4 * 3, positions, 0, m * 3)
+        gl.bufferSubData(gl.ARRAY_BUFFER, 0, positions, m * 3, rest * 3)
+        gl.bindBuffer(gl.ARRAY_BUFFER, current.velocityBuffer)
+        gl.bufferSubData(gl.ARRAY_BUFFER, hoge * 4 * 3, velocities, 0, m * 3)
+        gl.bufferSubData(gl.ARRAY_BUFFER, 0, velocities, m * 3, rest * 3)
+      } else {
+        gl.bindBuffer(gl.ARRAY_BUFFER, current.buffer)
+        gl.bufferSubData(gl.ARRAY_BUFFER, hoge * 4 * 3, positions, 0, n * 3)
+        gl.bindBuffer(gl.ARRAY_BUFFER, current.velocityBuffer)
+        gl.bufferSubData(gl.ARRAY_BUFFER, hoge * 4 * 3, velocities, 0, n * 3)
+      }
       hoge = (hoge + n) % numParticles
     }
 
@@ -288,11 +295,21 @@ onMounted(() => {
         positions[i + 1] = Math.random() * canvas.value.height
         positions[i + 2] = 0
       }
-      gl.bindBuffer(gl.ARRAY_BUFFER, current.buffer)
-      gl.bufferSubData(gl.ARRAY_BUFFER, hoge * 4 * 3, positions, 0, n * 3)
-      gl.bindBuffer(gl.ARRAY_BUFFER, current.velocityBuffer)
-      gl.bufferSubData(gl.ARRAY_BUFFER, hoge * 4 * 3, velocities, 0, n * 3)
-      gl.bindBuffer(gl.ARRAY_BUFFER, null)
+      if (hoge + n > numParticles) {
+        const m = numParticles - hoge
+        const rest = n - m
+        gl.bindBuffer(gl.ARRAY_BUFFER, current.buffer)
+        gl.bufferSubData(gl.ARRAY_BUFFER, hoge * 4 * 3, positions, 0, m * 3)
+        gl.bufferSubData(gl.ARRAY_BUFFER, 0, positions, m * 3, rest * 3)
+        gl.bindBuffer(gl.ARRAY_BUFFER, current.velocityBuffer)
+        gl.bufferSubData(gl.ARRAY_BUFFER, hoge * 4 * 3, velocities, 0, m * 3)
+        gl.bufferSubData(gl.ARRAY_BUFFER, 0, velocities, m * 3, rest * 3)
+      } else {
+        gl.bindBuffer(gl.ARRAY_BUFFER, current.buffer)
+        gl.bufferSubData(gl.ARRAY_BUFFER, hoge * 4 * 3, positions, 0, n * 3)
+        gl.bindBuffer(gl.ARRAY_BUFFER, current.velocityBuffer)
+        gl.bufferSubData(gl.ARRAY_BUFFER, hoge * 4 * 3, velocities, 0, n * 3)
+      }
       hoge = (hoge + n) % numParticles
     }
 

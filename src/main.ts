@@ -20,7 +20,9 @@ export const parameter = ref({
   length: 150,
   lengthStd: 50,
   diffusion: 250,
-  gravity: -1.0
+  gravity: -1.0,
+  density: 10,
+  densityStd: 2
 })
 
 const resize = () => {

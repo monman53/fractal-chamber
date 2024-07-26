@@ -72,6 +72,26 @@ import { humanReadable } from './utils'
         :max="1"
       /><br />
     </label>
+    <label>
+      density: {{ humanReadable(parameter.density) }}<br />
+      <input
+        type="range"
+        v-model.number="parameter.density"
+        :step="0.001"
+        :min="0"
+        :max="50"
+      /><br />
+    </label>
+    <label>
+      densityStd: {{ humanReadable(parameter.densityStd) }}<br />
+      <input
+        type="range"
+        v-model.number="parameter.densityStd"
+        :step="0.001"
+        :min="0"
+        :max="50"
+      /><br />
+    </label>
   </div>
 </template>
 
