@@ -4,13 +4,15 @@ import { humanReadable } from './utils'
 
 const fractalMode = () => {
   parameter.value.densityStd = 0
-  parameter.value.diffusion = 0
-  parameter.value.density = 1
-  parameter.value.opacity = 0.1
+  parameter.value.diffusion = 32
+  parameter.value.density = 0.4
+  parameter.value.opacity = 0.3
   parameter.value.gravity = -2
   parameter.value.length = 500
-  parameter.value.frequency = 0.02
+  parameter.value.lengthStd = 0
+  parameter.value.frequency = 0.1
   parameter.value.nIter = 7
+  parameter.value.noise = 16
 }
 </script>
 

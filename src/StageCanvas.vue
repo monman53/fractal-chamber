@@ -87,7 +87,7 @@ function makeVertexArray(gl: WebGL2RenderingContext, bufLocPairs: any) {
   return va
 }
 const offscreenCanvas = new OffscreenCanvas(app.value.width, app.value.height)
-const gl = offscreenCanvas.getContext('webgl2', { alpha: true })
+const gl = offscreenCanvas.getContext('webgl2', { alpha: true, premultipliedAlpha: false })
 const canvas = ref()
 onMounted(() => {
   // const gl = canvas.value.getContext('webgl2')
@@ -277,10 +277,15 @@ onMounted(() => {
       // L-system
       //--------------------------------
       // Rule
-      const m = 4
+      const m = parameter.value.folds
       const rules: any[] = []
       for (let i = 0; i < m; i++) {
-        rules.push({ angle: normalDistribution() * 0.3, ratio: Math.random() })
+        rules.push({
+          angle: (Math.random() - 0.5) * parameter.value.thickness,
+          // angle: Math.random() * 2 * Math.PI,
+          thickness: Math.random() * parameter.value.thickness,
+          ratio: Math.random()
+        })
       }
       // rules.sort((a, b) => a.ratio - b.ratio)
       // Iteration
@@ -288,9 +293,15 @@ onMounted(() => {
       for (let i = 0; i < parameter.value.nIter; i++) {
         edges = edges
           .map((edge) => {
+            // const edgeLength = edge.v.length()
             let ts = [edge.s]
             rules.forEach((rule) => {
-              const t = edge.s.add(edge.v.mul(rule.ratio).rotate(rule.angle))
+              const t = edge.s.add(
+                edge.v.mul(rule.ratio).add(edge.v.rotate(Math.PI / 2).mul(rule.angle))
+              )
+              // const t = edge.s.add(
+              //   edge.v.mul(rule.ratio).add(edge.v.rotate(rule.angle).mul(rule.thickness))
+              // )
               ts.push(t)
             })
             ts.push(edge.s.add(edge.v))
@@ -315,6 +326,7 @@ onMounted(() => {
             continue
           }
           const t = edge.s.add(edge.v.mul(Math.random()))
+          // const t = edge.s.add(edge.v.mul(i / m))
           positions[3 * n] = t.x
           positions[3 * n + 1] = t.y
           positions[3 * n + 2] = 0
@@ -322,7 +334,7 @@ onMounted(() => {
         }
       })
 
-      if (hoge + n > numParticles) {
+      if (hoge + n >= numParticles) {
         const m = numParticles - hoge
         const rest = n - m
         gl.bindBuffer(gl.ARRAY_BUFFER, current.buffer)
@@ -331,24 +343,24 @@ onMounted(() => {
         gl.bindBuffer(gl.ARRAY_BUFFER, current.velocityBuffer)
         gl.bufferSubData(gl.ARRAY_BUFFER, hoge * 4 * 3, velocities, 0, m * 3)
         gl.bufferSubData(gl.ARRAY_BUFFER, 0, velocities, m * 3, rest * 3)
-      } else {
+      } else if (n > 0) {
         gl.bindBuffer(gl.ARRAY_BUFFER, current.buffer)
         gl.bufferSubData(gl.ARRAY_BUFFER, hoge * 4 * 3, positions, 0, n * 3)
         gl.bindBuffer(gl.ARRAY_BUFFER, current.velocityBuffer)
         gl.bufferSubData(gl.ARRAY_BUFFER, hoge * 4 * 3, velocities, 0, n * 3)
       }
+      gl.bindBuffer(gl.ARRAY_BUFFER, null)
       hoge = (hoge + n) % numParticles
     }
 
     {
-      const n = 128
-      // const n = 0
+      const n = parameter.value.noise
       for (let i = 0; i < n * 3; i += 3) {
         positions[i] = (Math.random() - 0.5) * 2 * canvas.value.width
         positions[i + 1] = (Math.random() - 0.5) * 2 * canvas.value.height
         positions[i + 2] = 0
       }
-      if (hoge + n > numParticles) {
+      if (hoge + n >= numParticles) {
         const m = numParticles - hoge
         const rest = n - m
         gl.bindBuffer(gl.ARRAY_BUFFER, current.buffer)
@@ -363,6 +375,7 @@ onMounted(() => {
         gl.bindBuffer(gl.ARRAY_BUFFER, current.velocityBuffer)
         gl.bufferSubData(gl.ARRAY_BUFFER, hoge * 4 * 3, velocities, 0, n * 3)
       }
+      gl.bindBuffer(gl.ARRAY_BUFFER, null)
       hoge = (hoge + n) % numParticles
     }
 

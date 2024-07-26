@@ -24,7 +24,10 @@ export const parameter = ref({
   density: 2,
   densityStd: 2,
   frequency: 0.1,
-  nIter: 0
+  nIter: 0,
+  folds: 3,
+  thickness: 0.5,
+  noise: 128
 })
 
 export const parameterProps = ref({
@@ -104,6 +107,24 @@ export const parameterProps = ref({
     type: 'range',
     min: 0,
     max: 10,
+    step: 1
+  },
+  thickness: {
+    type: 'range',
+    min: 0,
+    max: 1,
+    step: 0.001
+  },
+  folds: {
+    type: 'range',
+    min: 0,
+    max: 8,
+    step: 1
+  },
+  noise: {
+    type: 'range',
+    min: 0,
+    max: 1024,
     step: 1
   }
 })
