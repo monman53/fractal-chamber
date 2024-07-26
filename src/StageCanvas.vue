@@ -1,10 +1,8 @@
-<script lang="ts">
-export const fps = ref(0)
-</script>
+<script lang="ts"></script>
 
 <script setup lang="ts">
 import { onMounted, ref, watch, type Ref } from 'vue'
-import { app, parameter } from './main'
+import { app, fps, parameter } from './main'
 
 // Shaders
 import updatePositionVS from './glsl/updatePosition.vert'
@@ -219,6 +217,7 @@ onMounted(() => {
     // Subtract the previous time from the current time
     const deltaTime = time - then
     fps.value = 1.0 / deltaTime
+    console.log(deltaTime)
     // Remember the current time for the next frame.
     then = time
 
@@ -345,7 +344,7 @@ onMounted(() => {
       canvas.value.height = app.value.height
       offscreenCanvas.width = app.value.width
       offscreenCanvas.height = app.value.height
-      window.requestAnimationFrame(render)
+      //   window.requestAnimationFrame(render)
     },
     { deep: true }
   )

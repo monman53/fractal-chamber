@@ -9,9 +9,11 @@ export const app = ref({
   fps: 0
 })
 
+export const fps = ref(0)
+
 export const parameter = ref({
   simplexResolution: 0.005,
-  simplexScale: 8.0,
+  simplexScale: 5.0,
   simplexTimeScale: 0.001,
   k: 1.1,
   opacity: 0.5,

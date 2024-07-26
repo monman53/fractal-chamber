@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { parameter } from './main'
-import { fps } from './StageCanvas.vue'
+import { fps, parameter } from './main'
 import { humanReadable } from './utils'
 </script>
 
@@ -36,7 +35,7 @@ import { humanReadable } from './utils'
         v-model.number="parameter.simplexScale"
         :step="0.01"
         :min="0.0"
-        :max="100"
+        :max="20"
       /><br />
     </label>
     <label>
