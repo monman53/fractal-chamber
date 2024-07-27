@@ -15,6 +15,8 @@ const fractalMode = () => {
   parameter.value.frequency = 0.4
   parameter.value.nIter = 6
   parameter.value.noise = 16
+  parameter.value.saturation = 0.9
+  parameter.value.lightness = 0.5
 }
 </script>
 

@@ -100,8 +100,8 @@ float noise(vec2 co) {
     return fract(sin(dot(co, vec2(12.9898f, 78.233f))) * 43758.5453f);
 }
 
-in vec3 oldPosition;
-in vec3 oldVelocity;
+in vec4 oldPosition;
+in vec4 oldVelocity;
 
 uniform float time;
 uniform float deltaTime;
@@ -113,16 +113,17 @@ uniform float k;
 uniform float diffusion;
 uniform float gravity;
 
-out vec3 newPosition;
-out vec3 newVelocity;
+out vec4 newPosition;
+out vec4 newVelocity;
 
 void main() {
     vec4 random = openSimplex2SDerivatives_ImproveXY(vec3(oldPosition.xy * simplexResolution, time * simplexTimeScale));
     newPosition = oldPosition + oldVelocity * deltaTime;
     float m = 1.0f;
-    vec3 accel;
+    vec4 accel;
     vec2 D = vec2(noise(oldPosition.xy) - 0.5f, noise(oldPosition.xy + 0.1f) - 0.5f) * diffusion;
     accel.xy = simplexScale * random.xy - k / m * oldVelocity.xy + D;
     accel.z = gravity;
+    accel.w = 0.f;// unused
     newVelocity = oldVelocity + accel * deltaTime;
 }

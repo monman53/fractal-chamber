@@ -14,6 +14,8 @@ import { normalDistribution, vec, vecRad } from './math'
 //--------------------------------
 // WebGL support functions
 //--------------------------------
+const dim = 4
+
 const createShader = (gl: WebGL2RenderingContext, type: GLenum, src: string) => {
   const shader = gl.createShader(type)
   if (!shader) {
@@ -77,7 +79,7 @@ function makeVertexArray(gl: WebGL2RenderingContext, bufLocPairs: any) {
     gl.enableVertexAttribArray(loc)
     gl.vertexAttribPointer(
       loc, // attribute location
-      3, // number of elements
+      dim, // number of elements
       gl.FLOAT, // type of data
       false, // normalize
       0, // stride (0 = auto)
@@ -123,7 +125,9 @@ onMounted(() => {
   const drawParticlesProgLocs = {
     position: gl.getAttribLocation(drawParticlesProgram, 'position'),
     matrix: gl.getUniformLocation(drawParticlesProgram, 'matrix'),
-    opacity: gl.getUniformLocation(drawParticlesProgram, 'opacity')
+    opacity: gl.getUniformLocation(drawParticlesProgram, 'opacity'),
+    saturation: gl.getUniformLocation(drawParticlesProgram, 'saturation'),
+    lightness: gl.getUniformLocation(drawParticlesProgram, 'lightness')
   }
 
   //--------------------------------
@@ -148,11 +152,13 @@ onMounted(() => {
     createPoints(numParticles, [
       [-0.5 * canvas.value.width, 0.5 * canvas.value.width],
       [-0.5 * canvas.value.height, 0.5 * canvas.value.height],
-      [-1000, -1000]
+      [-1000, -1000],
+      [0, 0]
     ])
   )
   const velocities = new Float32Array(
     createPoints(numParticles, [
+      [0, 0],
       [0, 0],
       [0, 0],
       [0, 0]
@@ -222,7 +228,8 @@ onMounted(() => {
 
     gl.clearColor(0, 0, 0, 1)
     gl.clear(gl.COLOR_BUFFER_BIT)
-    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
+    // gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
+    gl.blendFunc(gl.SRC_ALPHA, gl.DST_ALPHA)
 
     //--------------------------------
     // Update positions using transform feedback
@@ -272,6 +279,10 @@ onMounted(() => {
         0,
         parameter.value.density + normalDistribution() * parameter.value.densityStd
       )
+      // Color
+      const hue =
+        parameter.value.hueMin +
+        Math.random() * Math.max(0, parameter.value.hueMax - parameter.value.hueMin)
 
       //--------------------------------
       // L-system
@@ -327,9 +338,10 @@ onMounted(() => {
           }
           const t = edge.s.add(edge.v.mul(Math.random()))
           // const t = edge.s.add(edge.v.mul(i / m))
-          positions[3 * n] = t.x
-          positions[3 * n + 1] = t.y
-          positions[3 * n + 2] = 0
+          positions[dim * n] = t.x
+          positions[dim * n + 1] = t.y
+          positions[dim * n + 2] = 0
+          positions[dim * n + 3] = hue
           n += 1
         }
       })
@@ -338,16 +350,16 @@ onMounted(() => {
         const m = numParticles - hoge
         const rest = n - m
         gl.bindBuffer(gl.ARRAY_BUFFER, current.buffer)
-        gl.bufferSubData(gl.ARRAY_BUFFER, hoge * 4 * 3, positions, 0, m * 3)
-        gl.bufferSubData(gl.ARRAY_BUFFER, 0, positions, m * 3, rest * 3)
+        gl.bufferSubData(gl.ARRAY_BUFFER, hoge * 4 * dim, positions, 0, m * dim)
+        gl.bufferSubData(gl.ARRAY_BUFFER, 0, positions, m * dim, rest * dim)
         gl.bindBuffer(gl.ARRAY_BUFFER, current.velocityBuffer)
-        gl.bufferSubData(gl.ARRAY_BUFFER, hoge * 4 * 3, velocities, 0, m * 3)
-        gl.bufferSubData(gl.ARRAY_BUFFER, 0, velocities, m * 3, rest * 3)
+        gl.bufferSubData(gl.ARRAY_BUFFER, hoge * 4 * dim, velocities, 0, m * dim)
+        gl.bufferSubData(gl.ARRAY_BUFFER, 0, velocities, m * dim, rest * dim)
       } else if (n > 0) {
         gl.bindBuffer(gl.ARRAY_BUFFER, current.buffer)
-        gl.bufferSubData(gl.ARRAY_BUFFER, hoge * 4 * 3, positions, 0, n * 3)
+        gl.bufferSubData(gl.ARRAY_BUFFER, hoge * 4 * dim, positions, 0, n * dim)
         gl.bindBuffer(gl.ARRAY_BUFFER, current.velocityBuffer)
-        gl.bufferSubData(gl.ARRAY_BUFFER, hoge * 4 * 3, velocities, 0, n * 3)
+        gl.bufferSubData(gl.ARRAY_BUFFER, hoge * 4 * dim, velocities, 0, n * dim)
       }
       gl.bindBuffer(gl.ARRAY_BUFFER, null)
       hoge = (hoge + n) % numParticles
@@ -355,25 +367,31 @@ onMounted(() => {
 
     {
       const n = parameter.value.noise
-      for (let i = 0; i < n * 3; i += 3) {
+      for (let i = 0; i < n * dim; i += dim) {
+        // Color
+        const hue =
+          parameter.value.hueMin +
+          Math.random() * Math.max(0, parameter.value.hueMax - parameter.value.hueMin)
+
         positions[i] = (Math.random() - 0.5) * 2 * canvas.value.width
         positions[i + 1] = (Math.random() - 0.5) * 2 * canvas.value.height
         positions[i + 2] = 0
+        positions[i + 3] = hue
       }
       if (hoge + n >= numParticles) {
         const m = numParticles - hoge
         const rest = n - m
         gl.bindBuffer(gl.ARRAY_BUFFER, current.buffer)
-        gl.bufferSubData(gl.ARRAY_BUFFER, hoge * 4 * 3, positions, 0, m * 3)
-        gl.bufferSubData(gl.ARRAY_BUFFER, 0, positions, m * 3, rest * 3)
+        gl.bufferSubData(gl.ARRAY_BUFFER, hoge * 4 * dim, positions, 0, m * dim)
+        gl.bufferSubData(gl.ARRAY_BUFFER, 0, positions, m * dim, rest * dim)
         gl.bindBuffer(gl.ARRAY_BUFFER, current.velocityBuffer)
-        gl.bufferSubData(gl.ARRAY_BUFFER, hoge * 4 * 3, velocities, 0, m * 3)
-        gl.bufferSubData(gl.ARRAY_BUFFER, 0, velocities, m * 3, rest * 3)
+        gl.bufferSubData(gl.ARRAY_BUFFER, hoge * 4 * dim, velocities, 0, m * dim)
+        gl.bufferSubData(gl.ARRAY_BUFFER, 0, velocities, m * dim, rest * dim)
       } else {
         gl.bindBuffer(gl.ARRAY_BUFFER, current.buffer)
-        gl.bufferSubData(gl.ARRAY_BUFFER, hoge * 4 * 3, positions, 0, n * 3)
+        gl.bufferSubData(gl.ARRAY_BUFFER, hoge * 4 * dim, positions, 0, n * dim)
         gl.bindBuffer(gl.ARRAY_BUFFER, current.velocityBuffer)
-        gl.bufferSubData(gl.ARRAY_BUFFER, hoge * 4 * 3, velocities, 0, n * 3)
+        gl.bufferSubData(gl.ARRAY_BUFFER, hoge * 4 * dim, velocities, 0, n * dim)
       }
       gl.bindBuffer(gl.ARRAY_BUFFER, null)
       hoge = (hoge + n) % numParticles
@@ -391,6 +409,8 @@ onMounted(() => {
     ].flat()
     gl.uniformMatrix4fv(drawParticlesProgLocs.matrix, false, matrix)
     gl.uniform1f(drawParticlesProgLocs.opacity, parameter.value.opacity)
+    gl.uniform1f(drawParticlesProgLocs.saturation, parameter.value.saturation)
+    gl.uniform1f(drawParticlesProgLocs.lightness, parameter.value.lightness)
     gl.drawArrays(gl.POINTS, 0, numParticles)
 
     //--------------------------------

@@ -28,7 +28,11 @@ export const parameter = ref({
   nIter: 0,
   folds: 3,
   thickness: 0.5,
-  noise: 128
+  noise: 128,
+  hueMin: 0,
+  hueMax: 0.2,
+  saturation: 1.0,
+  lightness: 0.5
 })
 
 export const parameterProps = ref({
@@ -136,6 +140,34 @@ export const parameterProps = ref({
     min: 0,
     max: 1,
     step: 0.001
+  },
+  hueMin: {
+    type: 'range',
+    default: 0,
+    min: 0,
+    max: 1,
+    step: 0.0001
+  },
+  hueMax: {
+    type: 'range',
+    default: 0.3,
+    min: 0,
+    max: 1,
+    step: 0.0001
+  },
+  saturation: {
+    type: 'range',
+    default: 1.0,
+    min: 0,
+    max: 1,
+    step: 0.0001
+  },
+  lightness: {
+    type: 'range',
+    default: 1.0,
+    min: 0,
+    max: 1,
+    step: 0.0001
   },
   opacity: {
     type: 'range',
