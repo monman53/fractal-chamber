@@ -31,8 +31,8 @@ const widthPx = computed(() => {
 
 #canvas,
 #svg {
-  position: absolute;
   overflow: hidden;
+  position: absolute;
   height: v-bind(heightPx);
   /* width: v-bind(widthPx); */
 }

@@ -2,7 +2,7 @@
 
 <script setup lang="ts">
 import { onMounted, ref, watch } from 'vue'
-import { app, fps, parameter } from './main'
+import { app, fps, options, parameter } from './main'
 
 // Shaders
 import updatePositionVS from './glsl/updatePosition.vert?raw'
@@ -140,6 +140,7 @@ onMounted(() => {
   // Create buffers
   //--------------------------------
   // CPU initial buffers
+  // const numParticles = 1024 * 1024 * 16
   const numParticles = 1024 * 1024 * 1
   const bytes = numParticles * dim * 4
   const positions = new Float32Array(numParticles * dim)
@@ -264,11 +265,18 @@ onMounted(() => {
 
     if (Math.random() < parameter.value.frequency) {
       // Base segment
-      const s = vec(
-        (Math.random() - 0.5) * 2 * canvas.value.width,
-        (Math.random() - 0.5) * 2 * canvas.value.height
+      const dir = Math.random() * 2 * Math.PI
+      const centerDistance = Math.max(
+        0,
+        parameter.value.centerDistance + normalDistribution() * parameter.value.centerDistanceStd
       )
-      const v = vecRad(Math.random() * 2 * Math.PI)
+      const s = options.value.center
+        ? vecRad(dir).mul(centerDistance)
+        : vec(
+            (Math.random() - 0.5) * 2 * canvas.value.width,
+            (Math.random() - 0.5) * 2 * canvas.value.height
+          )
+      const v = vecRad(dir)
       const length = Math.max(
         0,
         parameter.value.length + normalDistribution() * parameter.value.lengthStd

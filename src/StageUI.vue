@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { parameter, parameterProps } from './main'
+import { options, parameter, parameterProps } from './main'
 import { humanReadable, randomParameter, resetParameter } from './utils'
 
 const fractalMode = () => {
@@ -27,20 +27,25 @@ const fractalMode = () => {
       <!-- {{ app.width }}, {{ app.height }} -->
       <!-- <br> -->
       <!-- FPS: {{ humanReadable(fps) }}<br /> -->
-      <template v-for="(prop, key) in parameterProps" :key="key">
-        <template v-if="prop.type === 'range'">
-          <label>
-            {{ key }}: {{ humanReadable(parameter[key]) }}<br />
-            <input
-              type="range"
-              v-model.number="parameter[key]"
-              :step="prop.step"
-              :min="prop.min"
-              :max="prop.max"
-            />
-          </label>
-          <br />
-        </template>
+      <template v-for="prop of parameterProps" :key="prop.name">
+        <label>
+          {{ prop.name }}: {{ humanReadable(parameter[prop.name as keyof typeof parameter]) }}<br />
+          <input
+            type="range"
+            v-model.number="parameter[prop.name as keyof typeof parameter]"
+            :step="prop.step"
+            :min="prop.min"
+            :max="prop.max"
+          />
+        </label>
+        <br />
+      </template>
+      <template v-for="(option, key) of options" :key="key">
+        <label>
+          <input type="checkbox" v-model="options[key]" />
+          {{ key }}
+        </label>
+        <br />
       </template>
       <button @click="fractalMode">fractal mode</button><br />
       <button @click="resetParameter">reset all</button><br />
@@ -51,6 +56,8 @@ const fractalMode = () => {
 
 <style scoped>
 #base {
+  max-height: 90vh;
+  overflow-y: scroll;
   background-color: #000;
   color: white;
 }
