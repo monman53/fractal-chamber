@@ -12,3 +12,13 @@ export const resetParameter = () => {
     }
   }
 }
+
+export const randomParameter = () => {
+  for (const param in parameterProps.value) {
+    if (param in parameter.value) {
+      const props = parameterProps.value[param as keyof typeof parameterProps.value]
+      parameter.value[param as keyof typeof parameter.value] =
+        props.min + Math.random() * (props.max - props.min)
+    }
+  }
+}

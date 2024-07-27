@@ -286,7 +286,7 @@ onMounted(() => {
       // L-system
       //--------------------------------
       // Rule
-      const m = parameter.value.folds
+      const m = Math.floor(parameter.value.folds)
       const rules: any[] = []
       for (let i = 0; i < m; i++) {
         rules.push({
@@ -332,7 +332,7 @@ onMounted(() => {
         const m = Math.floor(edge.v.length() * density)
         for (let i = 0; i < m; i += 1) {
           if (n >= numParticles) {
-            continue
+            return
           }
           const t = edge.s.add(edge.v.mul(Math.random()))
           // const t = edge.s.add(edge.v.mul(i / m))

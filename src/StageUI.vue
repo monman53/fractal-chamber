@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { parameter, parameterProps } from './main'
-import { humanReadable, resetParameter } from './utils'
+import { humanReadable, randomParameter, resetParameter } from './utils'
 
 const fractalMode = () => {
   resetParameter()
@@ -43,7 +43,8 @@ const fractalMode = () => {
         </template>
       </template>
       <button @click="fractalMode">fractal mode</button><br />
-      <button @click="resetParameter">reset all</button>
+      <button @click="resetParameter">reset all</button><br />
+      <!-- <button @click="randomParameter">random</button><br /> -->
     </details>
   </div>
 </template>
