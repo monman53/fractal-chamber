@@ -2,7 +2,7 @@
 
 <script setup lang="ts">
 import { onMounted, ref, watch } from 'vue'
-import { app, fps, options, parameter } from './main'
+import { app, fps, parameter } from './main'
 
 // Shaders
 import updatePositionVS from './glsl/updatePosition.vert?raw'
@@ -212,18 +212,24 @@ onMounted(() => {
   //================================
   let hoge = 0
   let then = 0
+  let counter = 0
+  let fpsThen = 0
   function render(time: number) {
     if (gl === null) {
       throw new Error()
     }
 
+    counter += 1
     // convert to seconds
     time *= 0.001
     // Subtract the previous time from the current time
     const deltaTime = time - then
-    fps.value = 1.0 / deltaTime
     // Remember the current time for the next frame.
     then = time
+    if (counter % 100 == 0) {
+      fps.value = 100 / (time - fpsThen)
+      fpsThen = time
+    }
 
     gl.clearColor(0, 0, 0, 1)
     gl.clear(gl.COLOR_BUFFER_BIT)
@@ -270,12 +276,13 @@ onMounted(() => {
         0,
         parameter.value.centerDistance + normalDistribution() * parameter.value.centerDistanceStd
       )
-      const s = options.value.center
-        ? vecRad(dir).mul(centerDistance)
-        : vec(
-            (Math.random() - 0.5) * 2 * canvas.value.width,
-            (Math.random() - 0.5) * 2 * canvas.value.height
-          )
+      const s =
+        Math.random() <= parameter.value.center
+          ? vecRad(dir).mul(centerDistance)
+          : vec(
+              (Math.random() - 0.5) * 2 * canvas.value.width,
+              (Math.random() - 0.5) * 2 * canvas.value.height
+            )
       const v = vecRad(dir)
       const length = Math.max(
         0,

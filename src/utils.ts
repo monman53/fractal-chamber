@@ -5,14 +5,18 @@ export const humanReadable = (x: number) => {
 }
 
 export const resetParameter = () => {
-  for (const prop of parameterProps) {
-    parameter.value[prop.name as keyof typeof parameter.value] = prop.default
+  for (const category of parameterProps) {
+    for (const prop of category.props) {
+      parameter.value[prop.name as keyof typeof parameter.value] = prop.default
+    }
   }
 }
 
 export const randomParameter = () => {
-  for (const prop of parameterProps) {
-    parameter.value[prop.name as keyof typeof parameter.value] =
-      prop.min + Math.random() * (prop.max - prop.min)
+  for (const category of parameterProps) {
+    for (const prop of category.props) {
+      parameter.value[prop.name as keyof typeof parameter.value] =
+        prop.min + Math.random() * (prop.max - prop.min)
+    }
   }
 }

@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { options, parameter, parameterProps } from './main'
+import { fileURLToPath } from 'url'
+import { fps, parameter, parameterProps } from './main'
 import { humanReadable, randomParameter, resetParameter } from './utils'
 
 const fractalMode = () => {
@@ -24,32 +25,42 @@ const fractalMode = () => {
   <div id="base">
     <details>
       <summary>parameters</summary>
-      <!-- {{ app.width }}, {{ app.height }} -->
-      <!-- <br> -->
-      <!-- FPS: {{ humanReadable(fps) }}<br /> -->
-      <template v-for="prop of parameterProps" :key="prop.name">
-        <label>
-          {{ prop.name }}: {{ humanReadable(parameter[prop.name as keyof typeof parameter]) }}<br />
-          <input
-            type="range"
-            v-model.number="parameter[prop.name as keyof typeof parameter]"
-            :step="prop.step"
-            :min="prop.min"
-            :max="prop.max"
-          />
-        </label>
-        <br />
+      <fieldset>
+        <legend>Info</legend>
+        FPS: {{ humanReadable(fps) }}<br />
+      </fieldset>
+      <template v-for="category of parameterProps" :key="category.name">
+        <fieldset>
+          <legend>{{ category.name }}</legend>
+          <template v-for="prop of category.props" :key="prop.name">
+            <label>
+              {{ prop.name }}
+              <br />
+              <input
+                type="range"
+                v-model.number="parameter[prop.name as keyof typeof parameter]"
+                :step="prop.step"
+                :min="prop.min"
+                :max="prop.max"
+              />
+            </label>
+            <i
+              class="bi bi-arrow-counterclockwise"
+              @click="parameter[prop.name as keyof typeof parameter] = prop.default"
+            ></i>
+            <span style="float: right">
+              {{ humanReadable(parameter[prop.name as keyof typeof parameter]) }}
+            </span>
+            <br />
+          </template>
+        </fieldset>
       </template>
-      <template v-for="(option, key) of options" :key="key">
-        <label>
-          <input type="checkbox" v-model="options[key]" />
-          {{ key }}
-        </label>
-        <br />
-      </template>
-      <button @click="fractalMode">fractal mode</button><br />
-      <button @click="resetParameter">reset all</button><br />
-      <!-- <button @click="randomParameter">random</button><br /> -->
+      <fieldset>
+        <legend>Templates</legend>
+        <button @click="fractalMode">fractal mode</button><br />
+        <button @click="resetParameter">reset all</button><br />
+        <!-- <button @click="randomParameter">random</button><br /> -->
+      </fieldset>
     </details>
   </div>
 </template>
@@ -57,8 +68,16 @@ const fractalMode = () => {
 <style scoped>
 #base {
   max-height: 90vh;
-  overflow-y: scroll;
+  overflow-y: auto;
   background-color: #000;
   color: white;
+}
+
+p {
+  margin: 0;
+}
+
+legend {
+  font-weight: bold;
 }
 </style>
