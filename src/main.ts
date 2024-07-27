@@ -38,9 +38,10 @@ export const parameter = ref({
   centerDistanceStd: 50
 })
 
-export const parameterProps = [
+export const parameterProps = ref([
   {
     name: 'Physics',
+    visible: false,
     props: [
       {
         name: 'frequency',
@@ -88,6 +89,7 @@ export const parameterProps = [
   },
   {
     name: 'Background',
+    visible: false,
     props: [
       {
         name: 'simplexResolution',
@@ -121,6 +123,7 @@ export const parameterProps = [
   },
   {
     name: 'Shape',
+    visible: false,
     props: [
       {
         name: 'center',
@@ -182,6 +185,7 @@ export const parameterProps = [
   },
   {
     name: 'Color',
+    visible: false,
     props: [
       {
         name: 'hueMin',
@@ -220,7 +224,7 @@ export const parameterProps = [
       }
     ]
   }
-]
+])
 
 resetParameter()
 

@@ -1,6 +1,10 @@
 <script setup lang="ts">
+import { ref, type Ref } from 'vue'
 import { fps, parameter, parameterProps } from './main'
 import { humanReadable, randomParameter, resetParameter } from './utils'
+
+type ModeType = 'control' | 'add' | 'edit' | 'info' | ''
+const mode: Ref<ModeType> = ref('control')
 
 const fractalMode = () => {
   resetParameter()
@@ -22,46 +26,101 @@ const fractalMode = () => {
 
 <template>
   <div id="base">
-    <details>
-      <summary>parameters</summary>
-      <fieldset>
-        <legend>Info</legend>
-        FPS: {{ humanReadable(fps) }}<br />
-      </fieldset>
-      <template v-for="category of parameterProps" :key="category.name">
+    <div class="mode-select">
+      <div>
+        <i v-if="mode === 'control'" class="bi bi-gear-fill pointer" @click="mode = ''" />
+        <i v-else class="bi bi-gear pointer" @click="mode = 'control'" />
+      </div>
+      <div>
+        <i v-if="mode === 'info'" class="bi bi-info-circle-fill pointer" @click="mode = ''" />
+        <i v-else class="bi bi-info-circle pointer" @click="mode = 'info'" />
+      </div>
+      <!-- <div>
+        <i v-if="mode === 'info'" class="bi bi-file-text-fill" @click="mode = ''" />
+        <i v-else class="bi bi-file-text" @click="mode = 'info'" />
+      </div> -->
+      <div style="text-align: right">
+        <a href="https://github.com/monman53/fractal-chamber"><i class="bi bi-github pointer" /></a>
+      </div>
+    </div>
+
+    <div class="content">
+      <div v-if="mode === 'control'" id="controller">
         <fieldset>
-          <legend>{{ category.name }}</legend>
-          <template v-for="prop of category.props" :key="prop.name">
-            <label>
-              {{ prop.name }}
-              <br />
-              <input
-                type="range"
-                v-model.number="parameter[prop.name as keyof typeof parameter]"
-                :step="prop.step"
-                :min="prop.min"
-                :max="prop.max"
-                @dblclick="parameter[prop.name as keyof typeof parameter] = prop.default"
-              />
-            </label>
-            <!-- <i
+          <legend>Info</legend>
+          FPS: {{ humanReadable(fps) }}<br />
+        </fieldset>
+        <template v-for="category of parameterProps" :key="category.name">
+          <fieldset>
+            <legend class="pointer" @click="category.visible = !category.visible">
+              <i class="bi bi-dash" v-if="category.visible"></i
+              ><i class="bi bi-plus" v-if="!category.visible"></i> {{ category.name }}
+            </legend>
+            <template v-if="category.visible">
+              <template v-for="prop of category.props" :key="prop.name">
+                <label>
+                  {{ prop.name }}
+                  <br />
+                  <input
+                    type="range"
+                    v-model.number="parameter[prop.name as keyof typeof parameter]"
+                    :step="prop.step"
+                    :min="prop.min"
+                    :max="prop.max"
+                    @dblclick="parameter[prop.name as keyof typeof parameter] = prop.default"
+                  />
+                </label>
+                <!-- <i
               class="bi bi-arrow-counterclockwise"
               @click="parameter[prop.name as keyof typeof parameter] = prop.default"
             ></i> -->
-            <span style="float: right">
-              {{ humanReadable(parameter[prop.name as keyof typeof parameter]) }}
-            </span>
-            <br />
-          </template>
+                <span style="float: right">
+                  {{ humanReadable(parameter[prop.name as keyof typeof parameter]) }}
+                </span>
+                <br />
+              </template>
+            </template>
+          </fieldset>
+        </template>
+        <fieldset>
+          <legend>Templates</legend>
+          <button @click="fractalMode">fractal mode</button><br />
+          <button @click="resetParameter">reset all</button><br />
+          <!-- <button @click="randomParameter">random</button><br /> -->
         </fieldset>
-      </template>
-      <fieldset>
-        <legend>Templates</legend>
-        <button @click="fractalMode">fractal mode</button><br />
-        <button @click="resetParameter">reset all</button><br />
-        <!-- <button @click="randomParameter">random</button><br /> -->
-      </fieldset>
-    </details>
+      </div>
+      <div v-if="mode === 'info'">
+        <p>
+          This application imitates cloud chamber with many small particles. It's just a visual
+          imitation and theoretical correctness is not guaranteed at all.
+        </p>
+        <p>
+          We are looking xy plane from z > 0. Particle positions and velocities are solved by
+          Newtonian method. There is no interaction between particles. This massive calculation is
+          performed by GPU (WebGL2 Transform Feedback).
+        </p>
+        <p>
+          Number of particles for calculation is constant. Only around z = 0 particles are visible.
+          Most of particles are invisible (z << 0 and alpha = 0). The alpha value depends on z
+          coordinate. More smaller z, more smaller alpha value (invisible).
+        </p>
+        <p>
+          There are two buffers for the particles, for position (vec4) and velocities (vec4). The
+          4th element of position is used for the color (hue). The 4th element of velocity is not
+          used. These buffers are managed like ring buffer. When new particles are generated, older
+          particles are disappeared and the buffers partition allocated for old ones are reused for
+          new ones.
+        </p>
+        <p>
+          Background random flow is generated by Simplex method (OpenSimplex). This random field is
+          used for the acceleration of the particles.
+        </p>
+        <p>We also have some features just for fun. (eg. colored particles, L-system patterns)</p>
+      </div>
+    </div>
+    <div v-if="mode !== ''" class="footer">
+      <small>Created by <a href="https://monman53.github.io/">monman53</a></small>
+    </div>
   </div>
 </template>
 
@@ -69,8 +128,6 @@ const fractalMode = () => {
 #base {
   max-height: 90vh;
   overflow-y: auto;
-  /* background-color: #000;
-  color: white; */
 
   margin: 1em;
   padding: 0.5em;
@@ -79,15 +136,44 @@ const fractalMode = () => {
   color: white;
   background-color: #0008;
   backdrop-filter: blur(4px);
+}
 
+#controller {
   user-select: none;
 }
 
-p {
+#controller p {
   margin: 0;
 }
 
 legend {
   font-weight: bold;
+}
+
+.content {
+  max-height: 80vh;
+  overflow: auto;
+}
+
+a {
+  color: white;
+  text-decoration: none;
+}
+
+.mode-select {
+  margin: 0.3em;
+  font-size: 1.5em;
+  display: grid;
+  grid-template-columns: auto auto auto auto 1fr;
+  gap: 0.3em;
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+.footer {
+  padding: 0.3em;
+  text-align: right;
 }
 </style>
