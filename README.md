@@ -3,7 +3,7 @@
 This application imitates cloud chamber with many small particles. It's just a visual
 imitation and theoretical correctness is not guaranteed at all.
 
-## Screenshot
+## Screenshots
 
 ![screenshot](./screenshot.png)
 ![screenshot](./screenshot2.png)
