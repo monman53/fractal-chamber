@@ -1,17 +1,19 @@
 <script setup lang="ts">
-import { fps, parameter, parameterProps } from './main'
-import { humanReadable } from './utils'
+import { parameter, parameterProps } from './main'
+import { humanReadable, resetParameter } from './utils'
 
 const fractalMode = () => {
+  resetParameter()
+  parameter.value.simplexScale = 0.5
   parameter.value.densityStd = 0
   parameter.value.diffusion = 32
   parameter.value.density = 0.4
-  parameter.value.opacity = 0.3
-  parameter.value.gravity = -2
-  parameter.value.length = 500
-  parameter.value.lengthStd = 0
-  parameter.value.frequency = 0.1
-  parameter.value.nIter = 7
+  parameter.value.opacity = 0.2
+  parameter.value.gravity = -4
+  parameter.value.length = 400
+  parameter.value.lengthStd = 100
+  parameter.value.frequency = 0.4
+  parameter.value.nIter = 6
   parameter.value.noise = 16
 }
 </script>
@@ -38,7 +40,8 @@ const fractalMode = () => {
           <br />
         </template>
       </template>
-      <button @click="fractalMode">fractal mode</button>
+      <button @click="fractalMode">fractal mode</button><br />
+      <button @click="resetParameter">reset all</button>
     </details>
   </div>
 </template>

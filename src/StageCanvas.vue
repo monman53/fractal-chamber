@@ -1,7 +1,7 @@
 <script lang="ts"></script>
 
 <script setup lang="ts">
-import { onMounted, ref, watch, type Ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import { app, fps, parameter } from './main'
 
 // Shaders
@@ -9,7 +9,7 @@ import updatePositionVS from './glsl/updatePosition.vert?raw'
 import updatePositionFS from './glsl/updatePosition.frag?raw'
 import drawParticlesVS from './glsl/drawParticles.vert?raw'
 import drawParticlesFS from './glsl/drawParticles.frag?raw'
-import { normalDistribution, vec, Vec, vecRad } from './math'
+import { normalDistribution, vec, vecRad } from './math'
 
 //--------------------------------
 // WebGL support functions
@@ -441,8 +441,3 @@ onMounted(() => {
     <canvas ref="canvas" :width="app.width" :height="app.height"></canvas>
   </div>
 </template>
-
-<style scoped>
-#base {
-}
-</style>

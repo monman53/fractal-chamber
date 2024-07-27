@@ -2,6 +2,7 @@ import './assets/main.css'
 
 import { createApp, ref } from 'vue'
 import App from './App.vue'
+import { resetParameter } from './utils'
 
 export const app = ref({
   width: window.innerWidth,
@@ -33,101 +34,119 @@ export const parameter = ref({
 export const parameterProps = ref({
   simplexResolution: {
     type: 'range',
+    default: 0.002,
     min: 0,
     max: 0.01,
-    step: 0.001
+    step: 0.00001
   },
   simplexTimeScale: {
     type: 'range',
+    default: 0.001,
     min: 0,
     max: 1,
     step: 0.001
   },
   simplexScale: {
     type: 'range',
+    default: 10,
     min: 0,
     max: 20,
-    step: 0.01
+    step: 0.001
   },
   k: {
     type: 'range',
+    default: 1,
     min: 0,
     max: 10,
     step: 0.01
   },
-  gravity: {
-    type: 'range',
-    min: -10,
-    max: 0,
-    step: 0.01
-  },
   diffusion: {
     type: 'range',
+    default: 500,
     min: 0,
     max: 1000,
     step: 0.01
   },
-  opacity: {
-    type: 'range',
-    min: 0,
-    max: 1,
-    step: 0.0001
-  },
   density: {
     type: 'range',
+    default: 2,
     min: 0,
-    max: 20,
+    max: 5,
     step: 0.001
   },
   densityStd: {
     type: 'range',
+    default: 1,
     min: 0,
-    max: 50,
+    max: 5,
     step: 0.001
+  },
+  noise: {
+    type: 'range',
+    default: 128,
+    min: 0,
+    max: 1024,
+    step: 1
   },
   length: {
     type: 'range',
+    default: 300,
     min: 0,
     max: 500,
     step: 0.001
   },
   lengthStd: {
     type: 'range',
+    default: 100,
     min: 0,
     max: 500,
     step: 0.001
   },
-  frequency: {
+  gravity: {
     type: 'range',
-    min: 0,
-    max: 1,
-    step: 0.001
+    default: -1,
+    min: -40,
+    max: 0,
+    step: 0.01
   },
   nIter: {
     type: 'range',
+    default: 0,
     min: 0,
     max: 10,
     step: 1
   },
-  thickness: {
-    type: 'range',
-    min: 0,
-    max: 1,
-    step: 0.001
-  },
   folds: {
     type: 'range',
+    default: 3,
     min: 0,
     max: 8,
     step: 1
   },
-  noise: {
+  thickness: {
     type: 'range',
+    default: 0.5,
     min: 0,
-    max: 1024,
-    step: 1
+    max: 1,
+    step: 0.001
+  },
+  frequency: {
+    type: 'range',
+    default: 0.1,
+    min: 0,
+    max: 1,
+    step: 0.001
+  },
+  opacity: {
+    type: 'range',
+    default: 0.5,
+    min: 0,
+    max: 1,
+    step: 0.0001
   }
 })
+
+resetParameter()
 
 const resize = () => {
   app.value.width = window.innerWidth
