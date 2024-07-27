@@ -40,6 +40,53 @@ export const parameter = ref({
 
 export const parameterProps = [
   {
+    name: 'Physics',
+    props: [
+      {
+        name: 'frequency',
+        default: 0.1,
+        min: 0,
+        max: 1,
+        step: 0.001
+      },
+      {
+        name: 'density',
+        default: 2,
+        min: 0,
+        max: 5,
+        step: 0.001
+      },
+      {
+        name: 'densityStd',
+        default: 1,
+        min: 0,
+        max: 5,
+        step: 0.001
+      },
+      {
+        name: 'diffusion',
+        default: 500,
+        min: 0,
+        max: 1000,
+        step: 0.01
+      },
+      {
+        name: 'k',
+        default: 1,
+        min: 0,
+        max: 10,
+        step: 0.01
+      },
+      {
+        name: 'gravity',
+        default: -1,
+        min: -40,
+        max: 0,
+        step: 0.01
+      }
+    ]
+  },
+  {
     name: 'Background',
     props: [
       {
@@ -69,53 +116,6 @@ export const parameterProps = [
         min: 0,
         max: 1024,
         step: 1
-      }
-    ]
-  },
-  {
-    name: 'Physics',
-    props: [
-      {
-        name: 'frequency',
-        default: 0.1,
-        min: 0,
-        max: 1,
-        step: 0.001
-      },
-      {
-        name: 'density',
-        default: 2,
-        min: 0,
-        max: 5,
-        step: 0.001
-      },
-      {
-        name: 'densityStd',
-        default: 1,
-        min: 0,
-        max: 5,
-        step: 0.001
-      },
-      {
-        name: 'k',
-        default: 1,
-        min: 0,
-        max: 10,
-        step: 0.01
-      },
-      {
-        name: 'diffusion',
-        default: 500,
-        min: 0,
-        max: 1000,
-        step: 0.01
-      },
-      {
-        name: 'gravity',
-        default: -1,
-        min: -40,
-        max: 0,
-        step: 0.01
       }
     ]
   },

@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { fileURLToPath } from 'url'
 import { fps, parameter, parameterProps } from './main'
 import { humanReadable, randomParameter, resetParameter } from './utils'
 
@@ -42,12 +41,13 @@ const fractalMode = () => {
                 :step="prop.step"
                 :min="prop.min"
                 :max="prop.max"
+                @dblclick="parameter[prop.name as keyof typeof parameter] = prop.default"
               />
             </label>
-            <i
+            <!-- <i
               class="bi bi-arrow-counterclockwise"
               @click="parameter[prop.name as keyof typeof parameter] = prop.default"
-            ></i>
+            ></i> -->
             <span style="float: right">
               {{ humanReadable(parameter[prop.name as keyof typeof parameter]) }}
             </span>
@@ -69,8 +69,18 @@ const fractalMode = () => {
 #base {
   max-height: 90vh;
   overflow-y: auto;
-  background-color: #000;
+  /* background-color: #000;
+  color: white; */
+
+  margin: 1em;
+  padding: 0.5em;
+  max-width: 30em;
+  border-radius: 1em;
   color: white;
+  background-color: #0008;
+  backdrop-filter: blur(4px);
+
+  user-select: none;
 }
 
 p {
