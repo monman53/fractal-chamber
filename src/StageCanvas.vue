@@ -6,7 +6,8 @@ import { app, fps, parameter } from './main'
 
 // Shaders
 import updatePositionVS from './glsl/updatePosition.vert?raw'
-import updatePositionFS from './glsl/updatePosition.frag?raw'
+import initializeVS from './glsl/initialize.vert?raw'
+import dummyFS from './glsl/dummy.frag?raw'
 import drawParticlesVS from './glsl/drawParticles.vert?raw'
 import drawParticlesFS from './glsl/drawParticles.frag?raw'
 import { normalDistribution, vec, vecRad } from './math'
@@ -55,10 +56,10 @@ function createProgram(
   return program
 }
 
-function makeBuffer(gl: WebGL2RenderingContext, sizeOrData: any, usage: GLenum) {
+function makeBuffer(gl: WebGL2RenderingContext, bytes: number, usage: GLenum) {
   const buf = gl.createBuffer()
   gl.bindBuffer(gl.ARRAY_BUFFER, buf)
-  gl.bufferData(gl.ARRAY_BUFFER, sizeOrData, usage)
+  gl.bufferData(gl.ARRAY_BUFFER, bytes, usage)
   return buf
 }
 
@@ -101,9 +102,14 @@ onMounted(() => {
   //--------------------------------
   // Create programs
   //--------------------------------
+  const initializationProgram = createProgram(
+    gl,
+    [initializeVS, dummyFS],
+    ['newPosition', 'newVelocity']
+  )
   const updatePositionProgram = createProgram(
     gl,
-    [updatePositionVS, updatePositionFS],
+    [updatePositionVS, dummyFS],
     ['newPosition', 'newVelocity']
   )
   const drawParticlesProgram = createProgram(gl, [drawParticlesVS, drawParticlesFS], [])
@@ -134,42 +140,16 @@ onMounted(() => {
   // Create buffers
   //--------------------------------
   // CPU initial buffers
-  const rand = (min: any, max: any) => {
-    if (max === undefined) {
-      max = min
-      min = 0
-    }
-    return Math.random() * (max - min) + min
-  }
-  const numParticles = 1024 * 1024 * 4
-  const createPoints = (num: number, ranges: any[]) =>
-    new Array(num)
-      .fill(0)
-      .map((_) => ranges.map((range) => rand(range[0], range[1])))
-      .flat()
-  // new Array(num * 3).fill(-1000)
-  const positions = new Float32Array(
-    createPoints(numParticles, [
-      [-0.5 * canvas.value.width, 0.5 * canvas.value.width],
-      [-0.5 * canvas.value.height, 0.5 * canvas.value.height],
-      [-1000, -1000],
-      [0, 0]
-    ])
-  )
-  const velocities = new Float32Array(
-    createPoints(numParticles, [
-      [0, 0],
-      [0, 0],
-      [0, 0],
-      [0, 0]
-    ])
-  )
+  const numParticles = 1024 * 1024 * 1
+  const bytes = numParticles * dim * 4
+  const positions = new Float32Array(numParticles * dim)
+  const velocities = new Float32Array(numParticles * dim)
 
   // GPU buffers
-  const position1Buffer = makeBuffer(gl, positions, gl.DYNAMIC_DRAW)
-  const position2Buffer = makeBuffer(gl, positions, gl.DYNAMIC_DRAW)
-  const velocity1Buffer = makeBuffer(gl, velocities, gl.DYNAMIC_DRAW)
-  const velocity2Buffer = makeBuffer(gl, velocities, gl.DYNAMIC_DRAW)
+  const position1Buffer = makeBuffer(gl, bytes, gl.DYNAMIC_DRAW)
+  const position2Buffer = makeBuffer(gl, bytes, gl.DYNAMIC_DRAW)
+  const velocity1Buffer = makeBuffer(gl, bytes, gl.DYNAMIC_DRAW)
+  const velocity2Buffer = makeBuffer(gl, bytes, gl.DYNAMIC_DRAW)
 
   // Vertex arrays for updater
   const updatePositionVA1 = makeVertexArray(gl, [
@@ -207,6 +187,24 @@ onMounted(() => {
   // unbind left over stuff
   gl.bindBuffer(gl.ARRAY_BUFFER, null)
   gl.bindBuffer(gl.TRANSFORM_FEEDBACK_BUFFER, null)
+
+  //================================
+  // Buffer initialization
+  //================================
+
+  gl.useProgram(initializationProgram)
+  // gl.bindVertexArray(current.updateVA)
+
+  gl.enable(gl.RASTERIZER_DISCARD)
+
+  gl.bindTransformFeedback(gl.TRANSFORM_FEEDBACK, next.tf)
+  gl.beginTransformFeedback(gl.POINTS)
+  gl.drawArrays(gl.POINTS, 0, numParticles)
+  gl.endTransformFeedback()
+  gl.bindTransformFeedback(gl.TRANSFORM_FEEDBACK, null)
+
+  // turn on using fragment shaders again
+  gl.disable(gl.RASTERIZER_DISCARD)
 
   //================================
   // Frame render function
