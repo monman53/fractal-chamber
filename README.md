@@ -1,45 +1,22 @@
 # fractal-chamber
 
-This template should help get you started developing with Vue 3 in Vite.
+This application imitates cloud chamber with many small particles. It's just a visual
+imitation and theoretical correctness is not guaranteed at all.
 
-## Recommended IDE Setup
+## Screenshot
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+![screenshot](./screenshot.png)
+![screenshot](./screenshot2.png)
 
-## Type Support for `.vue` Imports in TS
-
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vitejs.dev/config/).
-
-## Project Setup
+## Development
 
 ```sh
+# Initial setup
 npm install
-```
 
-### Compile and Hot-Reload for Development
-
-```sh
+# Launch development server
 npm run dev
-```
 
-### Type-Check, Compile and Minify for Production
-
-```sh
+# Build
 npm run build
-```
-
-### Run Unit Tests with [Vitest](https://vitest.dev/)
-
-```sh
-npm run test:unit
-```
-
-### Lint with [ESLint](https://eslint.org/)
-
-```sh
-npm run lint
 ```
