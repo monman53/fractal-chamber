@@ -4,7 +4,7 @@ import { fps, parameter, parameterProps } from './main'
 import { humanReadable, randomParameter, resetParameter } from './utils'
 
 type ModeType = 'control' | 'add' | 'edit' | 'info' | ''
-const mode: Ref<ModeType> = ref('control')
+const mode: Ref<ModeType> = ref('')
 
 const fractalMode = () => {
   resetParameter()
