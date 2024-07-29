@@ -141,8 +141,8 @@ onMounted(() => {
   // Create buffers
   //--------------------------------
   // CPU initial buffers
-  const numParticles = 1024 * 1024 * 16
-  // const numParticles = 1024 * 1024 * 1
+  // const numParticles = 1024 * 1024 * 16
+  const numParticles = 1024 * 1024 * 1
   const bytes = numParticles * dim * 4
   const positions = new Float32Array(numParticles * dim)
   const velocities = new Float32Array(numParticles * dim)
@@ -236,6 +236,7 @@ onMounted(() => {
     gl.clear(gl.COLOR_BUFFER_BIT)
     // gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
     gl.blendFunc(gl.SRC_ALPHA, gl.DST_ALPHA)
+    // gl.blendFunc(gl.ONE, gl.ZERO)
 
     //--------------------------------
     // Update positions using transform feedback
@@ -306,10 +307,8 @@ onMounted(() => {
       const rules: any[] = []
       for (let i = 0; i < m; i++) {
         rules.push({
-          angle: (Math.random() - 0.5) * parameter.value.thickness,
-          // angle: Math.random() * 2 * Math.PI,
-          thickness: Math.random() * parameter.value.thickness,
-          ratio: Math.random()
+          angle: normalDistribution() * parameter.value.thickness,
+          ratio: 0.5 + normalDistribution() * 0.1
         })
       }
       // rules.sort((a, b) => a.ratio - b.ratio)

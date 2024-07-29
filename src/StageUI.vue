@@ -8,19 +8,22 @@ const mode: Ref<ModeType> = ref('')
 
 const fractalMode = () => {
   resetParameter()
+  parameter.value.centerDistance = 160
   parameter.value.simplexScale = 0.5
+  // parameter.value.density = 1
+  parameter.value.density = 1
   parameter.value.densityStd = 0
-  parameter.value.diffusion = 32
-  parameter.value.density = 0.4
+  // parameter.value.diffusion = 32
   parameter.value.opacity = 0.2
-  parameter.value.gravity = -4
-  parameter.value.length = 400
+  parameter.value.gravity = -6
+  parameter.value.length = 600
   parameter.value.lengthStd = 100
-  parameter.value.frequency = 0.4
-  parameter.value.nIter = 6
-  parameter.value.noise = 16
+  parameter.value.frequency = 0.5
+  parameter.value.nIter = 7
+  // parameter.value.noise = 16
   parameter.value.saturation = 0.9
   parameter.value.lightness = 0.5
+  parameter.value.thickness = 0.18
 }
 </script>
 

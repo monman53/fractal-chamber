@@ -56,7 +56,7 @@ export const parameterProps = ref([
         name: 'density',
         default: 2,
         min: 0,
-        max: 5,
+        max: 10,
         step: 0.001
       },
       {
@@ -178,9 +178,9 @@ export const parameterProps = ref([
       },
       {
         name: 'thickness',
-        default: 0.5,
+        default: 0.1,
         min: 0,
-        max: 1,
+        max: 0.4,
         step: 0.001
       },
       {
@@ -205,7 +205,7 @@ export const parameterProps = ref([
     props: [
       {
         name: 'hueMin',
-        default: 0,
+        default: 0.1,
         min: 0,
         max: 1,
         step: 0.0001
