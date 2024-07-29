@@ -2,6 +2,7 @@
 
 in vec4 position;
 uniform mat4 matrix;
+uniform float particleSize;
 
 out vec3 hoge;
 out float hue;
@@ -12,5 +13,5 @@ void main() {
     // gl_Position = vec4(pos.xy, -pos.z / 100.f, 1);
     gl_Position = vec4(pos.xy, 0, 1);
     hue = position.w;
-    gl_PointSize = 1.0f;
+    gl_PointSize = particleSize;
 }

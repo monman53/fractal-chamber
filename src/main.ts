@@ -35,7 +35,9 @@ export const parameter = ref({
   lightness: 0.5,
   center: 1.0,
   centerDistance: 100,
-  centerDistanceStd: 50
+  centerDistanceStd: 50,
+  scale: 1,
+  particleSize: 1
 })
 
 export const parameterProps = ref([
@@ -179,6 +181,20 @@ export const parameterProps = ref([
         default: 0.5,
         min: 0,
         max: 1,
+        step: 0.001
+      },
+      {
+        name: 'particleSize',
+        default: 1.0,
+        min: 1,
+        max: 4,
+        step: 0.001
+      },
+      {
+        name: 'scale',
+        default: 1.0,
+        min: 1.0,
+        max: 10,
         step: 0.001
       }
     ]

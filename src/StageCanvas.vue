@@ -133,15 +133,16 @@ onMounted(() => {
     matrix: gl.getUniformLocation(drawParticlesProgram, 'matrix'),
     opacity: gl.getUniformLocation(drawParticlesProgram, 'opacity'),
     saturation: gl.getUniformLocation(drawParticlesProgram, 'saturation'),
-    lightness: gl.getUniformLocation(drawParticlesProgram, 'lightness')
+    lightness: gl.getUniformLocation(drawParticlesProgram, 'lightness'),
+    particleSize: gl.getUniformLocation(drawParticlesProgram, 'particleSize')
   }
 
   //--------------------------------
   // Create buffers
   //--------------------------------
   // CPU initial buffers
-  // const numParticles = 1024 * 1024 * 16
-  const numParticles = 1024 * 1024 * 1
+  const numParticles = 1024 * 1024 * 16
+  // const numParticles = 1024 * 1024 * 1
   const bytes = numParticles * dim * 4
   const positions = new Float32Array(numParticles * dim)
   const velocities = new Float32Array(numParticles * dim)
@@ -415,12 +416,13 @@ onMounted(() => {
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height)
 
     const matrix = [
-      [1 / canvas.value.width, 0, 0, 0],
-      [0, 1 / canvas.value.height, 0, 0],
+      [parameter.value.scale / canvas.value.width, 0, 0, 0],
+      [0, parameter.value.scale / canvas.value.height, 0, 0],
       [0, 0, 1, 0],
       [0, 0, 0, 1]
     ].flat()
     gl.uniformMatrix4fv(drawParticlesProgLocs.matrix, false, matrix)
+    gl.uniform1f(drawParticlesProgLocs.particleSize, parameter.value.particleSize)
     gl.uniform1f(drawParticlesProgLocs.opacity, parameter.value.opacity)
     gl.uniform1f(drawParticlesProgLocs.saturation, parameter.value.saturation)
     gl.uniform1f(drawParticlesProgLocs.lightness, parameter.value.lightness)
